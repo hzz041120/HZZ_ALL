@@ -1,62 +1,56 @@
 package com.gmail.hzz041120.utils;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * 文件编码转换工具
- * 
- * @author zhongzhou.hanzz 2013-1-8 下午1:14:34
- */
-public class FileEncodeTransferUtil {
+import com.gmail.hzz041120.utils.FileEncodeTransferUtil.EncodeTransferHandler;
+
+public class FileEncodeCheckUtil {
 
     private static String FOLD_PATH      = "foldPath";
     private static String CURRENT_ENCODE = "currentEncode";
     private static String TARGET_ENCODE  = "targetEncode";
 
-    // /**
-    // * 判断文件的编码格式
-    // */
-    // public static String codeString(String fileName) {
-    // BufferedInputStream bin;
-    // try {
-    // bin = new BufferedInputStream(new FileInputStream(fileName));
-    // int p = (bin.read() << 8) + bin.read();
-    // bin.close();
-    // String code = null;
-    // switch (p) {
-    // case 0xefbb:
-    // code = "UTF-8";
-    // break;
-    // case 0xfffe:
-    // code = "Unicode";
-    // break;
-    // case 0xfeff:
-    // code = "UTF-16BE";
-    // break;
-    // default:
-    // code = "GBK";
-    // }
-    // return code;
-    // } catch (FileNotFoundException e) {
-    // e.printStackTrace();
-    // return null;
-    // } catch (IOException e) {
-    // e.printStackTrace();
-    // return null;
-    // }
-    //
-    // }
+//    /**
+//     * 判断文件的编码格式
+//     */
+//    public static String codeString(String fileName) {
+//        BufferedInputStream bin;
+//        try {
+//            bin = new BufferedInputStream(new FileInputStream(fileName));
+//            int p = (bin.read() << 8) + bin.read();
+//            bin.close();
+//            String code = null;
+//            switch (p) {
+//                case 0xefbb:
+//                    code = "UTF-8";
+//                    break;
+//                case 0xfffe:
+//                    code = "Unicode";
+//                    break;
+//                case 0xfeff:
+//                    code = "UTF-16BE";
+//                    break;
+//                default:
+//                    code = "GBK";
+//            }
+//            return code;
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//            return null;
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//        
+//    }
 
     public static void main(String[] args) {
         String foldPath = "/Users/hzz041120/work/cpwork/feedback/intl-gangesweb/deploy/templates";
@@ -113,55 +107,6 @@ public class FileEncodeTransferUtil {
     }
 
     /**
-     * 编码转换处理器
-     * 
-     * @author zhongzhou.hanzz 2013-1-8 下午1:15:56
-     */
-    static class EncodeTransferHandler implements TraversalHandler {
-
-        public boolean invoke(Map<String, String> context, File file) {
-            String currentEncode = context.get(CURRENT_ENCODE);
-            String targetEncode = context.get(TARGET_ENCODE);
-
-            String extension = getFilenameExtension(file);
-            if (extension != "" && "vm".equals(extension)) {
-                System.out.println(file.getAbsolutePath());
-                File targetFile = new File(file.getAbsolutePath() + ".tmp");
-                try {
-
-                    BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file),
-                                                                                 currentEncode));
-                    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetFile),
-                                                                                  targetEncode));
-                    int i = 0;
-                    while (true) {
-                        i++;
-                        String line = br.readLine();
-                        if (line == null) break;
-                        bw.write(line + "\r\n");
-                        if (i == 500) {
-                            bw.flush();
-                            i = 0;
-                        }
-                    }
-                    bw.flush();
-                    bw.close();
-                    br.close();
-                    targetFile.renameTo(file);
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            return true;
-        }
-
-    }
-
-    /**
      * 校验文件字符是否在指定的编码范围之内
      * 
      * @author zhongzhou.hanzz 2013-1-8 下午1:32:58
@@ -179,7 +124,9 @@ public class FileEncodeTransferUtil {
 
                     BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file),
                                                                                  currentEncode));
+                    int i = 0;
                     while (true) {
+                        i++;
                         String line = br.readLine();
                         if (line == null) break;
                     }
