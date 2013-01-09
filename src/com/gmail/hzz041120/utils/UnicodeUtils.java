@@ -11,24 +11,8 @@ public class UnicodeUtils {
         if (a == null || a.length() == 0) return null;
         char[] charArray = a.toCharArray();
         StringBuilder sb = new StringBuilder();
-        for (Character c : charArray) {
-            StringBuilder sb1 = new StringBuilder();
-            System.out.print(c + "\t");
-            sb.append("\\u");
-            String tc = c + "";
-            byte[] bytes = tc.getBytes();
-            for (byte b : bytes) {
-                if (b < 0) {
-                    System.out.print(((b-1) ^ (1<<32)) + "\t");
-                    sb.append(Integer.toHexString(b ^ (1<<8)));
-                    sb1.append(Integer.toHexString(b ^ (1<<8)));
-                } else {
-                    System.out.print(b + "\t");
-                    sb.append(Integer.toHexString(b));
-                    sb1.append(Integer.toHexString(b));
-                }
-            }
-            System.out.println(sb1.toString());
+        for (char c : charArray) {
+            sb.append(c + "\t\\u" + Integer.toHexString(c) + "\n");
         }
         return sb.toString();
     }

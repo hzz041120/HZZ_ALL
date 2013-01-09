@@ -60,7 +60,7 @@ public class FileEncodeTransferUtil {
 
     public static void main(String[] args) {
         String foldPath = "/Users/hzz041120/work/cpwork/feedback/intl-gangesweb/deploy/templates";
-        String curEncode = "UTF-8";
+        String curEncode = "GBK";
         String targetEncode = "UTF-8";
         Map<String, String> context = new HashMap<String, String>();
         // 文件路径
@@ -81,6 +81,7 @@ public class FileEncodeTransferUtil {
         EncodeTransferHandler handler = new EncodeTransferHandler();
         FileEncodeCheckHandler checkHandler = new FileEncodeCheckHandler();
         String foldPath = context.get(FOLD_PATH);
+        traversalFile(foldPath, context, handler);
         traversalFile(foldPath, context, checkHandler);
     }
 
@@ -174,7 +175,7 @@ public class FileEncodeTransferUtil {
 
             String extension = getFilenameExtension(file);
             if (extension != "" && "vm".equals(extension)) {
-                
+
                 File targetFile = new File(file.getAbsolutePath() + ".tmp");
                 try {
 
@@ -184,11 +185,16 @@ public class FileEncodeTransferUtil {
                     while (true) {
                         String line = br.readLine();
                         if (line == null) break;
-                        if (!line.matches("[\u0000-\u007F|\uFF00-\uFFEF|\u3400+\u4DB5|\u4e00-\u9fa5]*")) {
+                        // \\u000-\\u007F ASCII 标点符号
+                        // \\uFF00-\\uFFEF ASCII 全角字符
+                        // (U+3000-U+303F) 中日韩标点
+                        // (U+3400-U+4DB5) 中日韩统一汉字扩展集A
+                        // (U+4e00-U+9fa5) 中日韩统一汉字
+                        if (!line.matches("[\u0000-\u007F|\uFF00-\uFFEF|\u3000-\u303F|\u3400+\u4db5|\u4e00-\u9fa5]*")) {
                             System.out.println(file.getAbsolutePath());
                             System.out.println(linenum + "\t" + line);
                         }
-                        linenum ++;
+                        linenum++;
                     }
                     br.close();
                     targetFile.renameTo(file);
