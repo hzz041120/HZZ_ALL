@@ -60,7 +60,7 @@ public class FileEncodeTransferUtil {
 
     public static void main(String[] args) {
         String foldPath = "/Users/hzz041120/work/cpwork/feedback/intl-gangesweb/deploy/templates";
-        String curEncode = "GBK";
+        String curEncode = "UTF-8";
         String targetEncode = "UTF-8";
         Map<String, String> context = new HashMap<String, String>();
         // 文件路径
@@ -79,12 +79,13 @@ public class FileEncodeTransferUtil {
      */
     public static void doTransfer(Map<String, String> context) {
         EncodeTransferHandler handler = new EncodeTransferHandler();
+        FileEncodeCheckHandler checkHandler = new FileEncodeCheckHandler();
         String foldPath = context.get(FOLD_PATH);
-        traversalFile(foldPath, context, handler);
+        traversalFile(foldPath, context, checkHandler);
     }
 
     // 遍历文件, 并调用指定处理器
-    private static void traversalFile(String foldPath, Map<String, String> context, EncodeTransferHandler handler) {
+    private static void traversalFile(String foldPath, Map<String, String> context, TraversalHandler handler) {
         File root = new File(foldPath);
         if (!root.exists()) return;
         if (root.isDirectory()) {
@@ -173,15 +174,21 @@ public class FileEncodeTransferUtil {
 
             String extension = getFilenameExtension(file);
             if (extension != "" && "vm".equals(extension)) {
-                System.out.println(file.getAbsolutePath());
+                
                 File targetFile = new File(file.getAbsolutePath() + ".tmp");
                 try {
 
                     BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file),
                                                                                  currentEncode));
+                    int linenum = 1;
                     while (true) {
                         String line = br.readLine();
                         if (line == null) break;
+                        if (!line.matches("[\u0000-\u007F|\uFF00-\uFFEF|\u3400+\u4DB5|\u4e00-\u9fa5]*")) {
+                            System.out.println(file.getAbsolutePath());
+                            System.out.println(linenum + "\t" + line);
+                        }
+                        linenum ++;
                     }
                     br.close();
                     targetFile.renameTo(file);
