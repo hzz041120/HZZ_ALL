@@ -1,13 +1,18 @@
 package com.gmail.hzz041120.utils;
 
+/**
+ * Unicode字符辅助工具
+ * 
+ * @author zhongzhou.hanzz 2013-1-9 上午11:32:42
+ */
 public class UnicodeUtils {
 
-    public static void main(String[] args) {
-        String a = "##链接从ma account setting 的portal页点击时，需要宽屏显示（没有左侧菜单）。";
-        System.out.println(printStringOxValue(a));
+    public static void main(String[] args) throws Exception{
+        String a = "1、以每一行为单位；只有“判断是否单个检查API调用方式=true\"才有效<br/>";
+        System.out.println(printStringAsciiValue(a));
     }
 
-    private static String printStringOxValue(String a) {
+    public static String printStringOxValue(String a) {
         if (a == null || a.length() == 0) return null;
         char[] charArray = a.toCharArray();
         StringBuilder sb = new StringBuilder();
@@ -16,4 +21,14 @@ public class UnicodeUtils {
         }
         return sb.toString();
     }
+    
+    public static String printStringAsciiValue(String a) {
+        if (a == null || a.length() == 0) return null;
+        char[] charArray = a.toCharArray();
+        StringBuilder sb = new StringBuilder();
+        for (char c : charArray) {
+            sb.append(c + "\t%" + Integer.toHexString(c) + "\n");
+        }
+        return sb.toString();
+    } 
 }

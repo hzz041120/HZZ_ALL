@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 文件编码转换工具
+ * 文件编码转换及验证工具
  * 
  * @author zhongzhou.hanzz 2013-1-8 下午1:14:34
  */
@@ -24,42 +24,8 @@ public class FileEncodeTransferUtil {
     private static String CURRENT_ENCODE = "currentEncode";
     private static String TARGET_ENCODE  = "targetEncode";
 
-    // /**
-    // * 判断文件的编码格式
-    // */
-    // public static String codeString(String fileName) {
-    // BufferedInputStream bin;
-    // try {
-    // bin = new BufferedInputStream(new FileInputStream(fileName));
-    // int p = (bin.read() << 8) + bin.read();
-    // bin.close();
-    // String code = null;
-    // switch (p) {
-    // case 0xefbb:
-    // code = "UTF-8";
-    // break;
-    // case 0xfffe:
-    // code = "Unicode";
-    // break;
-    // case 0xfeff:
-    // code = "UTF-16BE";
-    // break;
-    // default:
-    // code = "GBK";
-    // }
-    // return code;
-    // } catch (FileNotFoundException e) {
-    // e.printStackTrace();
-    // return null;
-    // } catch (IOException e) {
-    // e.printStackTrace();
-    // return null;
-    // }
-    //
-    // }
-
     public static void main(String[] args) {
-        String foldPath = "/Users/hzz041120/work/cpwork/feedback/intl-gangesweb/deploy/templates";
+        String foldPath = "/Users/hzz041120/work/cpwork/feedback/intl-gangesaide/deploy/templates";
         String curEncode = "GBK";
         String targetEncode = "UTF-8";
         Map<String, String> context = new HashMap<String, String>();
@@ -81,7 +47,7 @@ public class FileEncodeTransferUtil {
         EncodeTransferHandler handler = new EncodeTransferHandler();
         FileEncodeCheckHandler checkHandler = new FileEncodeCheckHandler();
         String foldPath = context.get(FOLD_PATH);
-        traversalFile(foldPath, context, handler);
+//        traversalFile(foldPath, context, handler);
         traversalFile(foldPath, context, checkHandler);
     }
 
@@ -171,7 +137,7 @@ public class FileEncodeTransferUtil {
     static class FileEncodeCheckHandler implements TraversalHandler {
 
         public boolean invoke(Map<String, String> context, File file) {
-            String currentEncode = context.get(CURRENT_ENCODE);
+            String currentEncode = context.get(TARGET_ENCODE);
 
             String extension = getFilenameExtension(file);
             if (extension != "" && "vm".equals(extension)) {
@@ -187,10 +153,11 @@ public class FileEncodeTransferUtil {
                         if (line == null) break;
                         // \\u000-\\u007F ASCII 标点符号
                         // \\uFF00-\\uFFEF ASCII 全角字符
+                        // \u2000-\u206F 通用标点
                         // (U+3000-U+303F) 中日韩标点
                         // (U+3400-U+4DB5) 中日韩统一汉字扩展集A
                         // (U+4e00-U+9fa5) 中日韩统一汉字
-                        if (!line.matches("[\u0000-\u007F|\uFF00-\uFFEF|\u3000-\u303F|\u3400+\u4db5|\u4e00-\u9fa5]*")) {
+                        if (!line.matches("[\u0000-\u007F|\uFF00-\uFFEF|\u2000-\u206F|\u3000-\u303F|\u3400+\u4db5|\u4e00-\u9fa5]*")) {
                             System.out.println(file.getAbsolutePath());
                             System.out.println(linenum + "\t" + line);
                         }
