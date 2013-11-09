@@ -1,6 +1,5 @@
 package com.gmail.hzz041120.db;
 
-import java.util.regex.Matcher;
 
 /**
  * SQL LIKEÓï¾ä×Ö·û´®Ô¤´¦Àí
@@ -8,10 +7,10 @@ import java.util.regex.Matcher;
 public class SqlLikeStringPretreatmentUtil {
 
     public static String preMysql(String str) {
-     // Ìæ»»MYSQLÍ³Åä±£Áô·ûºÅ$ _
-        str = Matcher.quoteReplacement(str);
-        str.replaceAll("\\_", "\\\\_");
+        // Ìæ»»MYSQLÍ³Åä±£Áô·ûºÅ$ _
+        str = str.replaceAll("\\_", "\\\\_");
+        str = str.replaceAll("\\%", "\\\\%");
         return str;
     }
-    
+
 }
