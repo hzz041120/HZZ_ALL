@@ -25,7 +25,7 @@ public class FileEncodeTransferUtil {
     private static String TARGET_ENCODE  = "targetEncode";
 
     public static void main(String[] args) {
-        String foldPath = "/Users/hzz041120/work/cpwork/feedback/intl-gangesaide/deploy/templates";
+        String foldPath = "/home/hzz041120/cpwork/order/intl-creditma/deploy/templates";
         String curEncode = "GBK";
         String targetEncode = "UTF-8";
         Map<String, String> context = new HashMap<String, String>();
