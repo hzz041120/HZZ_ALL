@@ -57,12 +57,14 @@ public class AIServiceForROI {
     }
 
     private ExecuteResult findRejectJobList(ExecuteResult selfRes, ExecuteResult outSourcingRes) {
-        // TODO Auto-generated method stub
+        //FIXME
         return null;
     }
 
     private ExecuteResult findOutSourcingJobList(ExecuteResult selfRes) {
-        // TODO Auto-generated method stub
+        //除掉自产的剩余工件类型和数量
+        Map<JobType, Integer> jobType$count = new HashMap<JobType, Integer>();
+        //这里又特么要一个遗传算法计算 不过这个简单很多 FIXME
         return null;
     }
 
