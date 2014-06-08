@@ -2,8 +2,8 @@ package hzz.service;
 
 import hzz.domain.JobType;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -17,9 +17,9 @@ public class JobSelection {
     private double            randomArea;
     private Map<Integer, JobType> randomJobMark = new HashMap<Integer, JobType>();
     private int               scale         = 100;
-    private Random            random        = new Random();
+    private static final Random            random        = new Random();
 
-    public JobSelection(List<JobType> jobs) {
+    public JobSelection(Collection<JobType> jobs) {
         for (JobType job : jobs) {
             randomArea += job.getRoi();
         }
