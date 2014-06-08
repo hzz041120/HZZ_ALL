@@ -1,19 +1,27 @@
 package hzz.domain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 public class ExecuteResult {
 
     // y预期的可执行时间
-    private Integer worktime;
+    private Integer                      worktime;
     // 总损益
-    private Integer profitAndLoss;
+    private Integer                      profitAndLoss;
+    // 当前任务的类型和数量
+    private Map<JobType, Integer> jobType$count = new HashMap<JobType, Integer>();
 
     public Integer getProfitAndLoss() {
         return profitAndLoss;
+    }
+
+    public Map<JobType, Integer> getJobType$count() {
+        return jobType$count;
     }
 
     // 执行过行
@@ -53,6 +61,12 @@ public class ExecuteResult {
             }
             job.getWorkDetails().put(m, timeEntry);
             profitAndLoss += job.getJobType().getRev();
+            Integer jobCount = jobType$count.get(job.getJobType());
+            if (jobCount == null) {
+                jobCount = 1;
+            } else {
+                jobCount++;
+            }
         }
         return true;
     }

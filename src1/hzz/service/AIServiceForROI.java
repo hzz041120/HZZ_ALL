@@ -7,6 +7,7 @@ import hzz.domain.Machine;
 import hzz.util.ExecuteResultComparator;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -84,7 +85,7 @@ public class AIServiceForROI {
      * @return
      */
     private void mutation(List<ExecuteResult> resultList) {
-        MutationService.mutation(resultList, jobSelection);
+        MutationService.mutation(resultList);
     }
 
     /**
@@ -112,11 +113,20 @@ public class AIServiceForROI {
         for (int i = 0; i < initResSize; i++) {
             ExecuteResult res = new ExecuteResult(worktime);
             while (true) {
+                //如果工件数量已经达到要求则取消掉该类型工件的份额
                 JobType jobType = jobSelection.getRandomJobByRoi();
+                Integer currentJobCount = res.getJobType$count().get(jobType);
+                if (currentJobCount > jobType$count.get(jobType)) {
+                    Collection<JobType> jobs = jobSelection.getJobs();
+                    jobs.remove(jobType);
+                    jobSelection = new JobSelection(jobs);
+                    continue;
+                }
                 Job job = jobType.getInstance();
                 if (!res.addJob(job)) {
                     break;
                 }
+
             }
             resList.add(res);
         }

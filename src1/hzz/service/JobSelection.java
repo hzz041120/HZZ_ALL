@@ -14,10 +14,11 @@ import java.util.Random;
  */
 public class JobSelection {
 
-    private double            randomArea;
+    private double                randomArea;
     private Map<Integer, JobType> randomJobMark = new HashMap<Integer, JobType>();
-    private int               scale         = 100;
-    private static final Random            random        = new Random();
+    private int                   scale         = 100;
+    private static final Random   random        = new Random();
+    private Collection<JobType>   jobs;
 
     public JobSelection(Collection<JobType> jobs) {
         for (JobType job : jobs) {
@@ -42,4 +43,13 @@ public class JobSelection {
     public JobType getRandomJobByRoi() {
         return randomJobMark.get(random.nextInt(scale));
     }
+
+    public Collection<JobType> getJobs() {
+        return jobs;
+    }
+
+    public void setJobs(Collection<JobType> jobs) {
+        this.jobs = jobs;
+    }
+
 }

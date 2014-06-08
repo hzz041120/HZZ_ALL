@@ -7,29 +7,33 @@ import hzz.domain.JobType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 public class MutationService {
 
     private static final Random random = new Random();
 
-    public static List<ExecuteResult> mutation(List<ExecuteResult> resultList, JobSelection jobSelection) {
+    public static List<ExecuteResult> mutation(List<ExecuteResult> resultList) {
         List<ExecuteResult> mutationResList = new ArrayList<ExecuteResult>(resultList.size());
         for (ExecuteResult execRes : resultList) {
-            mutationResList.add(mutation(execRes, jobSelection));
+            mutationResList.add(mutation(execRes));
         }
         return mutationResList;
     }
 
-    private static ExecuteResult mutation(ExecuteResult execRes, JobSelection jobSelection) {
+    private static ExecuteResult mutation(ExecuteResult execRes) {
+
         ExecuteResult mutationRes = new ExecuteResult(execRes.getWorktime());
         List<Job> jobList = execRes.getJobList();
         int mutationIndex = random.nextInt(jobList.size());
         Job job = jobList.get(mutationIndex);
-        JobType jobType = jobSelection.getRandomJobByRoi();
-        while (jobType.equals(job.getJobType())) {
-            jobType = jobSelection.getRandomJobByRoi();
-        }
-        jobList.set(mutationIndex, jobType.getInstance());
+        //获取除当前任务外的其他任务，做轮盘随机
+        Set<JobType> keySet = AIServiceForROI.jobType$count.keySet();
+        JobType jobType = job.getJobType();
+        keySet.remove(jobType);
+        JobSelection jobSelection = new JobSelection(keySet);
+        JobType newJobType = jobSelection.getRandomJobByRoi();
+        jobList.set(mutationIndex, newJobType.getInstance());
         for (Job j : jobList) {
             if (!mutationRes.addJob(j)) {
                 return execRes;
