@@ -9,24 +9,24 @@ import java.util.LinkedHashMap;
  */
 public class Job {
 
-    /* 实际需要的工作时间 */
-    private int                               realWorkTime;
+//    /* 单个需要的工作时间 */
+//    private int                               realWorkTime;
     /* 任务类型 */
     private JobType                           jobType;
 
     private LinkedHashMap<Machine, TimeEntry> workDetails = new LinkedHashMap<Machine, TimeEntry>();
 
-    public int getRealWorkTime() {
-        return realWorkTime;
-    }
+//    public int getRealWorkTime() {
+//        return realWorkTime;
+//    }
 
     public JobType getJobType() {
         return jobType;
     }
 
-    public void setRealWorkTime(int realWorkTime) {
-        this.realWorkTime = realWorkTime;
-    }
+//    public void setRealWorkTime(int realWorkTime) {
+//        this.realWorkTime = realWorkTime;
+//    }
 
     public void setJobType(JobType jobType) {
         this.jobType = jobType;

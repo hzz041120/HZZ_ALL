@@ -21,11 +21,6 @@ public class Machine {
     // 可以接收新任务的开始时间
     private int                          startWorkDelay;
 
-    /**
-     * 任务收益耗时表
-     */
-    private Map<JobType, JobExecuteInfo> jobExecMap = new HashMap<JobType, JobExecuteInfo>();
-
     public String getMachineName() {
         return machineName;
     }
@@ -38,16 +33,8 @@ public class Machine {
         this.startWorkDelay = startWorkDelay;
     }
 
-    public Map<JobType, JobExecuteInfo> getJobExecMap() {
-        return jobExecMap;
-    }
-
     public void setMachineName(String machineName) {
         this.machineName = machineName;
-    }
-
-    public void setJobExecMap(Map<JobType, JobExecuteInfo> jobExecMap) {
-        this.jobExecMap = jobExecMap;
     }
 
     public static final Machine newMachine(String machineName) {

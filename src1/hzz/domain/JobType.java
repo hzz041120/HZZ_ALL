@@ -47,7 +47,7 @@ public class JobType {
     public Job getInstance() {
         Job instance = new Job();
         instance.setJobType(this);
-        instance.setRealWorkTime(timeCost);
+//        instance.setRealWorkTime(timeCost);
         return instance;
     }
 }
