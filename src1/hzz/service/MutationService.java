@@ -5,9 +5,9 @@ import hzz.domain.Job;
 import hzz.domain.JobType;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 public class MutationService {
 
@@ -28,7 +28,7 @@ public class MutationService {
         int mutationIndex = random.nextInt(jobList.size());
         Job job = jobList.get(mutationIndex);
         //获取除当前任务外的其他任务，做轮盘随机
-        Set<JobType> keySet = AIServiceForROI.jobType$count.keySet();
+        Collection<JobType> keySet = execRes.getAvaliableJobTypeList();
         JobType jobType = job.getJobType();
         keySet.remove(jobType);
         JobSelection jobSelection = new JobSelection(keySet);

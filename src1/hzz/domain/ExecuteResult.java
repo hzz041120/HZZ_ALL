@@ -1,6 +1,9 @@
 package hzz.domain;
 
+import hzz.service.AIServiceForROI;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -10,9 +13,9 @@ import java.util.Map.Entry;
 public class ExecuteResult {
 
     // y预期的可执行时间
-    private Integer                      worktime;
+    private Integer               worktime;
     // 总损益
-    private Integer                      profitAndLoss;
+    private Integer               profitAndLoss;
     // 当前任务的类型和数量
     private Map<JobType, Integer> jobType$count = new HashMap<JobType, Integer>();
 
@@ -102,4 +105,16 @@ public class ExecuteResult {
         return worktime;
     }
 
+    public Collection<JobType> getAvaliableJobTypeList() {
+        Collection<JobType> avaliable = new ArrayList<JobType>();
+        for (Map.Entry<JobType, Integer> entry : AIServiceForROI.jobType$count.entrySet()) {
+            JobType key = entry.getKey();
+            Integer currentCnt = jobType$count.get(key);
+            currentCnt = currentCnt == null ? 0 : currentCnt;
+            if (currentCnt <= entry.getValue()) {
+                avaliable.add(key);
+            }
+        }
+        return avaliable;
+    }
 }
