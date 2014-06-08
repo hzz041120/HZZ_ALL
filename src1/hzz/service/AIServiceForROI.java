@@ -63,7 +63,7 @@ public class AIServiceForROI {
         List<ExecuteResult> resultList = initOriginalResult(initResSize);
         for (int i = 0; i < generation; i++) {
             /** 交叉 */
-            resultList = crossover(resultList);
+            resultList = recombination(resultList);
             /** 变异 */
             resultList = mutation(resultList);
         }
@@ -82,14 +82,13 @@ public class AIServiceForROI {
     }
 
     /**
-     * 执行交叉计算，当前采用的方案是实值重组的收尾结对中间重组
+     * 执行交叉计算，当前采用的方案是实值重组的中间重组
      * 
      * @param resultList
      * @return
      */
-    private List<ExecuteResult> crossover(List<ExecuteResult> resultList) {
-        
-        return null;
+    private List<ExecuteResult> recombination(List<ExecuteResult> resultList) {
+        return RecombinationService.doIntermediateRecobination(resultList);
     }
 
     private ExecuteResult getBestResult(List<ExecuteResult> originalResult) {
