@@ -82,13 +82,13 @@ public class AIServiceForROI {
     }
 
     /**
-     * 执行交叉计算，当前采用的方案是实值重组的中间重组
+     * 执行交叉计算，当前采用的方案是实值重组的收尾结对中间重组
      * 
      * @param resultList
      * @return
      */
     private List<ExecuteResult> crossover(List<ExecuteResult> resultList) {
-        // TODO Auto-generated method stub
+        
         return null;
     }
 
