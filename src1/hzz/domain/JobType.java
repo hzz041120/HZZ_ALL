@@ -9,13 +9,15 @@ import java.util.LinkedHashMap;
  */
 public class JobType {
 
-    public JobType(Integer rev, Integer timeCost, LinkedHashMap<Machine, Integer> machine$time) {
+    public JobType(String jobName, Integer rev, Integer timeCost, LinkedHashMap<Machine, Integer> machine$time) {
+        this.jobName = jobName;
         this.roi = rev / timeCost;
         this.rev = rev;
         this.timeCost = timeCost;
         this.machine$time = machine$time;
     }
 
+    private String                          jobName;
     // 自主加工需要的时间
     private Integer                         timeCost;
     // 每个机器加工需要的时间
@@ -36,6 +38,10 @@ public class JobType {
         return rev;
     }
 
+    public String getJobName() {
+        return jobName;
+    }
+
     public Integer getTimeCost() {
         return timeCost;
     }
@@ -47,7 +53,13 @@ public class JobType {
     public Job getInstance() {
         Job instance = new Job();
         instance.setJobType(this);
-//        instance.setRealWorkTime(timeCost);
+        // instance.setRealWorkTime(timeCost);
         return instance;
     }
+
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        return jobName.equals(((JobType) obj).getJobName());
+    }
+
 }

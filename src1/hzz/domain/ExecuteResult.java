@@ -8,15 +8,18 @@ import java.util.Map.Entry;
 public class ExecuteResult {
 
     // y预期的可执行时间
-    private Integer   worktime;
-    // 当前任务队列需要的工作时间
-    private Integer   currentTimeCost;
+    private Integer worktime;
     // 总损益
-    private Integer   profitAndLoss;
+    private Integer profitAndLoss;
+
+    public Integer getProfitAndLoss() {
+        return profitAndLoss;
+    }
+
     // 执行过行
     private List<Job> jobList = new ArrayList<Job>();
     // 以时间为维度的任务中间节点的任务下标,用于交叉计算
-    private double    middlePoint;
+    private int       middlePoint;
 
     public ExecuteResult(int worktime) {
         this.worktime = worktime;
@@ -26,7 +29,7 @@ public class ExecuteResult {
         LinkedHashMap<Machine, Integer> machine$time = job.getJobType().getMachine$time();
         // 上一台机器的当前工作时间点
         int preMachineDelay = 0;
-        double middleTime = worktime / 2d;
+        double middleTime = getWorktime() / 2d;
         for (Entry<Machine, Integer> entry : machine$time.entrySet()) {
             Machine m = entry.getKey();
             int startWorkDelay = m.getStartWorkDelay();
@@ -38,7 +41,7 @@ public class ExecuteResult {
             TimeEntry timeEntry = new TimeEntry();
             timeEntry.setStartTime(startWorkDelay);
             int endTime = startWorkDelay + jobMachineTimeCost;
-            if (endTime > worktime) {
+            if (endTime > getWorktime()) {
                 return false;
             }
             preMachineDelay = endTime;
@@ -46,9 +49,10 @@ public class ExecuteResult {
             // 更新机器的工作计划
             m.setStartWorkDelay(endTime);
             if (startWorkDelay < middleTime && endTime >= middleTime) {
-                setMiddlePoint(jobList.size());
+                setMiddlePoint(getJobList().size());
             }
             job.getWorkDetails().put(m, timeEntry);
+            profitAndLoss += job.getJobType().getRev();
         }
         return true;
     }
@@ -61,18 +65,27 @@ public class ExecuteResult {
      */
     public boolean addJob(Job job) {
         if (isAllowAddJob(job)) {
-            jobList.add(job);
+            getJobList().add(job);
             return true;
         } else {
             return false;
         }
     }
 
-    public double getMiddlePoint() {
+    public int getMiddlePoint() {
         return middlePoint;
     }
 
-    public void setMiddlePoint(double middlePoint) {
+    public void setMiddlePoint(int middlePoint) {
         this.middlePoint = middlePoint;
     }
+
+    public List<Job> getJobList() {
+        return jobList;
+    }
+
+    public Integer getWorktime() {
+        return worktime;
+    }
+
 }

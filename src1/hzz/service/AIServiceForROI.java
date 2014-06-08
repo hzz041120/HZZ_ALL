@@ -4,8 +4,10 @@ import hzz.domain.ExecuteResult;
 import hzz.domain.Job;
 import hzz.domain.JobType;
 import hzz.domain.Machine;
+import hzz.util.ExecuteResultComparator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,8 +27,8 @@ public class AIServiceForROI {
     // 机器列表
     public static List<Machine>         machineList   = new ArrayList<Machine>();
     /** 算法精细化参数 */
-    // 初始化解集大小
-    private int                         initResSize   = 10;
+    // 初始化解集大小 必须是偶数个便于交叉 改进方案再说
+    private int                         initResSize   = 5 * 2;
     // 遗传代数
     private int                         generation    = 10000;
 
@@ -39,6 +41,9 @@ public class AIServiceForROI {
         // FIXME 初始化
     }
 
+    /**
+     * 产生生产计划
+     */
     public void process() {
         /** 获得自我加工的产品流水 */
         ExecuteResult selfRes = findSelfJobList();
@@ -46,6 +51,8 @@ public class AIServiceForROI {
         ExecuteResult outSourcingRes = findOutSourcingJobList(selfRes);
         /** 获得拒绝加工的产品流水 */
         ExecuteResult rejectRes = findRejectJobList(selfRes, outSourcingRes);
+        /** 打印生产计划表 */
+        // FIXME
     }
 
     private ExecuteResult findRejectJobList(ExecuteResult selfRes, ExecuteResult outSourcingRes) {
@@ -65,7 +72,7 @@ public class AIServiceForROI {
             /** 交叉 */
             resultList = recombination(resultList);
             /** 变异 */
-            resultList = mutation(resultList);
+            mutation(resultList);
         }
         return getBestResult(resultList);
     }
@@ -76,13 +83,12 @@ public class AIServiceForROI {
      * @param resultList
      * @return
      */
-    private List<ExecuteResult> mutation(List<ExecuteResult> resultList) {
-        // TODO Auto-generated method stub
-        return null;
+    private void mutation(List<ExecuteResult> resultList) {
+        MutationService.mutation(resultList, jobSelection);
     }
 
     /**
-     * 执行交叉计算，当前采用的方案是实值重组的中间重组
+     * 执行交叉计算
      * 
      * @param resultList
      * @return
@@ -91,9 +97,9 @@ public class AIServiceForROI {
         return RecombinationService.doIntermediateRecobination(resultList);
     }
 
-    private ExecuteResult getBestResult(List<ExecuteResult> originalResult) {
-        // TODO Auto-generated method stub
-        return null;
+    private ExecuteResult getBestResult(List<ExecuteResult> result) {
+        Collections.sort(result, new ExecuteResultComparator());
+        return result.get(0);
     }
 
     /*
