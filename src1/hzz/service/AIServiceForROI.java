@@ -17,16 +17,20 @@ import java.util.Map;
  */
 public class AIServiceForROI {
 
+    /** 初始条件 */
     // 加工日期限制
     public static int                   worktime      = 0;
     // 工件类型及生产数量
     public static Map<JobType, Integer> jobType$count = new HashMap<JobType, Integer>();
     // 机器列表
-    public static List<Machine>   machineList   = new ArrayList<Machine>();
+    public static List<Machine>         machineList   = new ArrayList<Machine>();
+    /** 算法精细化参数 */
     // 初始化解集大小
-    private int                   initResSize   = 10;
+    private int                         initResSize   = 10;
+    // 遗传代数
+    private int                         generation    = 10000;
 
-    private JobSelection          jobSelection  = new JobSelection(jobType$count.keySet());
+    private JobSelection                jobSelection  = new JobSelection(jobType$count.keySet());
 
     /**
      * 初始化生产环境
@@ -56,7 +60,40 @@ public class AIServiceForROI {
 
     private ExecuteResult findSelfJobList() {
         /** 初始化解集合 */
-        List<ExecuteResult> originalResult = initOriginalResult(initResSize);
+        List<ExecuteResult> resultList = initOriginalResult(initResSize);
+        for (int i = 0; i < generation; i++) {
+            /** 交叉 */
+            resultList = crossover(resultList);
+            /** 变异 */
+            resultList = mutation(resultList);
+        }
+        return getBestResult(resultList);
+    }
+
+    /**
+     * 执行变异，当前采用的是随机单工件变异
+     * 
+     * @param resultList
+     * @return
+     */
+    private List<ExecuteResult> mutation(List<ExecuteResult> resultList) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * 执行交叉计算，当前采用的方案是实值重组的中间重组
+     * 
+     * @param resultList
+     * @return
+     */
+    private List<ExecuteResult> crossover(List<ExecuteResult> resultList) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    private ExecuteResult getBestResult(List<ExecuteResult> originalResult) {
+        // TODO Auto-generated method stub
         return null;
     }
 
@@ -68,7 +105,7 @@ public class AIServiceForROI {
     private List<ExecuteResult> initOriginalResult(int initResSize) {
         List<ExecuteResult> resList = new ArrayList<ExecuteResult>();
         for (int i = 0; i < initResSize; i++) {
-            ExecuteResult res = new ExecuteResult();
+            ExecuteResult res = new ExecuteResult(worktime);
             while (true) {
                 JobType jobType = jobSelection.getRandomJobByRoi();
                 Job job = jobType.getInstance();
