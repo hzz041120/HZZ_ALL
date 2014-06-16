@@ -12,10 +12,10 @@ import java.util.Map.Entry;
 
 public class ExecuteResult {
 
-    // y预期的可执行时间
+    // 预期的可执行时间
     private Integer               worktime;
     // 总损益
-    private Integer               profitAndLoss;
+    private Integer               profitAndLoss = 0;
     // 当前任务的类型和数量
     private Map<JobType, Integer> jobType$count = new HashMap<JobType, Integer>();
 
@@ -60,6 +60,7 @@ public class ExecuteResult {
             // 更新机器的工作计划
             m.setStartWorkDelay(endTime);
             if (startWorkDelay < middleTime && endTime >= middleTime) {
+                System.out.println("Middle Point is : " + getJobList().size());
                 setMiddlePoint(getJobList().size());
             }
             job.getWorkDetails().put(m, timeEntry);

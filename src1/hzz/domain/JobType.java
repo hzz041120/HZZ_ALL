@@ -1,6 +1,9 @@
 package hzz.domain;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 工件类型
@@ -9,11 +12,15 @@ import java.util.LinkedHashMap;
  */
 public class JobType {
 
-    public JobType(String jobName, Integer rev, Integer timeCost, LinkedHashMap<Machine, Integer> machine$time) {
+    private static Map<String, JobType> jobTypeMap = new HashMap<String, JobType>();
+
+    private JobType(String jobName, Integer rev, Integer rejectRev, Integer timeCost,
+                    LinkedHashMap<Machine, Integer> machine$time) {
         this.jobName = jobName;
         this.roi = rev / timeCost;
         this.rev = rev;
         this.timeCost = timeCost;
+        this.rejectRev = rejectRev;
         this.machine$time = machine$time;
     }
 
@@ -24,6 +31,8 @@ public class JobType {
     private LinkedHashMap<Machine, Integer> machine$time;
     // 自主加工的利润
     private Integer                         rev;
+    // 拒绝加工的利润
+    private Integer                         rejectRev;
     private double                          roi;
 
     // 外包加工的时间
@@ -38,6 +47,10 @@ public class JobType {
         return rev;
     }
 
+    public Integer getRejectRev() {
+        return rejectRev;
+    }
+
     public String getJobName() {
         return jobName;
     }
@@ -50,6 +63,18 @@ public class JobType {
         return machine$time;
     }
 
+    public static JobType newJobType(String jobName, Integer rev, Integer rejectRev, Integer timeCost,
+                                     LinkedHashMap<Machine, Integer> machine$time) {
+        if (jobTypeMap.containsKey(jobName)) {
+            return jobTypeMap.get(jobName);
+        }
+        return new JobType(jobName, rev, rejectRev, timeCost, machine$time);
+    }
+
+    public static Collection<JobType> getAllJobType() {
+        return jobTypeMap.values();
+    }
+
     public Job getInstance() {
         Job instance = new Job();
         instance.setJobType(this);
@@ -59,7 +84,12 @@ public class JobType {
 
     public boolean equals(Object obj) {
         if (obj == null) return false;
+        System.out.println(jobName + "<===>" + ((JobType) obj).getJobName());
         return jobName.equals(((JobType) obj).getJobName());
+    }
+
+    public int hashCode() {
+        return this.getJobName().hashCode();
     }
 
 }

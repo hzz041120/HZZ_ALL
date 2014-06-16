@@ -19,8 +19,8 @@ public class RecombinationService {
     public static List<ExecuteResult> doIntermediateRecobination(List<ExecuteResult> resultList) {
         // 进行相邻分组 可改进
         int i = 0;
-        List<ExecuteResult> resList = new ArrayList<ExecuteResult>();
-        while (i < resList.size()) {
+        List<ExecuteResult> resList = new ArrayList<ExecuteResult>(resultList.size());
+        while (i < resultList.size()) {
             ExecuteResult firstRes = resultList.get(i++);
             ExecuteResult secondRes = resultList.get(i++);
             List<ExecuteResult> crossResList = doCross(firstRes, secondRes);
@@ -41,7 +41,7 @@ public class RecombinationService {
         int smp = secondRes.getMiddlePoint();
         List<Job> sJobList = secondRes.getJobList();
         List<Job> f21 = sJobList.subList(0, smp);
-        List<Job> f22 = sJobList.subList(smp, fJobList.size());
+        List<Job> f22 = sJobList.subList(smp, sJobList.size());
 
         ExecuteResult child1 = getCrossResult(firstRes, f11, f21);
         if (child1 != null) res.add(child1);

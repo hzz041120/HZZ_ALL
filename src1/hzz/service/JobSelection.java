@@ -2,8 +2,10 @@ package hzz.service;
 
 import hzz.domain.JobType;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -24,15 +26,20 @@ public class JobSelection {
         for (JobType job : jobs) {
             randomArea += job.getRoi();
         }
+//        System.out.println(randomArea);
         /* 精度100% 可以适当调高 */
         int percent = 0;
         for (JobType job : jobs) {
-            int newPercent = (int) (scale * (job.getRoi() / randomArea));
+//            System.out.println("Start ! ===>" + job.getJobName());
+            int newPercent = (int) (scale * (job.getRoi() / randomArea)) + percent;
+//            System.out.println("percent ===> " + newPercent);
             for (int i = percent; i < newPercent; i++) {
+//                System.out.println(i + " === " + job.getJobName());
                 randomJobMark.put(i, job);
             }
-            percent += newPercent;
+            percent = newPercent;
         }
+        scale = percent;
     }
 
     /**
@@ -41,7 +48,9 @@ public class JobSelection {
      * @return
      */
     public JobType getRandomJobByRoi() {
-        return randomJobMark.get(random.nextInt(scale));
+        int nextInt = random.nextInt(scale);
+//         System.out.println(nextInt);
+        return randomJobMark.get(nextInt);
     }
 
     public Collection<JobType> getJobs() {
@@ -50,6 +59,21 @@ public class JobSelection {
 
     public void setJobs(Collection<JobType> jobs) {
         this.jobs = jobs;
+    }
+
+    public static void main(String[] args) {
+        List<JobType> jobs = new ArrayList<JobType>();
+        jobs.add(JobType.newJobType("J1", 100, -9, 100, null));
+        jobs.add(JobType.newJobType("J2", 100, -9, 50, null));
+        jobs.add(JobType.newJobType("J2", 100, -9, 50, null));
+        JobSelection js = new JobSelection(jobs);
+//        while (true) {
+//            JobType res = js.getRandomJobByRoi();
+//            if (res == null) {
+//                System.out.println("===================>");
+//                break;
+//            }
+//        }
     }
 
 }
