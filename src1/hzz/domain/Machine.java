@@ -17,9 +17,9 @@ public class Machine {
     }
 
     // 机器名称
-    private String                       machineName;
+    private String machineName;
     // 可以接收新任务的开始时间
-    private int                          startWorkDelay;
+    private int    startWorkDelay;
 
     public String getMachineName() {
         return machineName;
@@ -45,6 +45,10 @@ public class Machine {
             machineMap.put(machineName, m);
             return m;
         }
+    }
+
+    public void reset() {
+        this.startWorkDelay = 0;
     }
 
 }

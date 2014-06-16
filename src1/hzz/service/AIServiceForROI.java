@@ -39,7 +39,7 @@ public class AIServiceForROI {
      * 初始化生产环境
      */
     public void init() {
-        worktime = 1000;
+        worktime = 400;
         // 初始化工件表
         jobType$count = new HashMap<JobType, Integer>();
         LinkedHashMap<Machine, Integer> j1Machine$time = new LinkedHashMap<Machine, Integer>();

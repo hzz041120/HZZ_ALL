@@ -53,6 +53,7 @@ public class ExecuteResult {
             timeEntry.setStartTime(startWorkDelay);
             int endTime = startWorkDelay + jobMachineTimeCost;
             if (endTime > getWorktime()) {
+                resetAllMachine();
                 return false;
             }
             preMachineDelay = endTime;
@@ -60,9 +61,16 @@ public class ExecuteResult {
             // 更新机器的工作计划
             m.setStartWorkDelay(endTime);
             if (startWorkDelay < middleTime && endTime >= middleTime) {
+                System.out.println("startWorkDelay: " + startWorkDelay + ", middleTime:" + middleTime + ", endTime:"
+                                   + endTime);
+                // 只要有一个机器触及中间时间节点则将当前节点设置为中间
                 System.out.println("Middle Point is : " + getJobList().size());
-                setMiddlePoint(getJobList().size());
+                if (middlePoint < 0) {
+                    setMiddlePoint(getJobList().size());
+                }
             }
+            System.out.println("---- Machine " + m.getMachineName() + " : start->" + timeEntry.getStartTime()
+                               + ", end-->" + timeEntry.getEndTime());
             job.getWorkDetails().put(m, timeEntry);
             profitAndLoss += job.getJobType().getRev();
             Integer jobCount = jobType$count.get(job.getJobType());
@@ -73,6 +81,12 @@ public class ExecuteResult {
             }
         }
         return true;
+    }
+
+    public void resetAllMachine() {
+        for (Machine m : Machine.machineMap.values()) {
+            m.reset();
+        }
     }
 
     /**
