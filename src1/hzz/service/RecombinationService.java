@@ -31,7 +31,9 @@ public class RecombinationService {
 
     private static List<ExecuteResult> doCross(ExecuteResult firstRes, ExecuteResult secondRes) {
         List<ExecuteResult> res = new ArrayList<ExecuteResult>();
+        firstRes.setResultName("firstRes");
         res.add(firstRes);
+        secondRes.setResultName("secondRes");
         res.add(secondRes);
         int fmp = firstRes.getMiddlePoint();
         List<Job> fJobList = firstRes.getJobList();
@@ -44,14 +46,27 @@ public class RecombinationService {
         List<Job> f22 = sJobList.subList(smp, sJobList.size());
 
         ExecuteResult child1 = getCrossResult(firstRes, f11, f21);
-        if (child1 != null) res.add(child1);
+        if (child1 != null) {
+            child1.setResultName("child1");
+            res.add(child1);
+        }
         ExecuteResult child2 = getCrossResult(firstRes, f11, f22);
-        if (child2 != null) res.add(child2);
+        if (child2 != null) {
+            child2.setResultName("child2");
+            res.add(child2);
+        }
         ExecuteResult child3 = getCrossResult(firstRes, f12, f21);
-        if (child3 != null) res.add(child3);
+        if (child3 != null) {
+            child3.setResultName("child3");
+            res.add(child3);
+        }
         ExecuteResult child4 = getCrossResult(firstRes, f12, f21);
-        if (child4 != null) res.add(child4);
-        return sortByRevAndGetBest2(res);
+        if (child4 != null) {
+            child4.setResultName("child4");
+            res.add(child4);
+        }
+        List<ExecuteResult> sortRes = sortByRevAndGetBest2(res);
+        return sortRes;
     }
 
     private static List<ExecuteResult> sortByRevAndGetBest2(List<ExecuteResult> res) {
@@ -63,13 +78,18 @@ public class RecombinationService {
         ExecuteResult child = new ExecuteResult(firstRes.getWorktime());
         for (Job j : x) {
             if (!child.addJob(j)) {
-                child = null;
-                break;
+                return null;
             }
         }
         for (Job j : y) {
             if (!child.addJob(j)) {
                 return null;
+            }
+        }
+        while (true) {
+            JobSelection js = new JobSelection(child.getAvaliableJobTypeList());
+            if (!child.addJob(js.getRandomJobByRoi().getInstance())) {
+                break;
             }
         }
         return child;

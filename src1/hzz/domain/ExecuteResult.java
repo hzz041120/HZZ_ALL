@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 
 public class ExecuteResult {
 
+    private String                resultName;
     // 预期的可执行时间
     private Integer               worktime;
     // 总损益
@@ -61,16 +62,16 @@ public class ExecuteResult {
             // 更新机器的工作计划
             m.setStartWorkDelay(endTime);
             if (startWorkDelay < middleTime && endTime >= middleTime) {
-                System.out.println("startWorkDelay: " + startWorkDelay + ", middleTime:" + middleTime + ", endTime:"
-                                   + endTime);
+                // System.out.println("startWorkDelay: " + startWorkDelay + ", middleTime:" + middleTime + ", endTime:"
+                // + endTime);
                 // 只要有一个机器触及中间时间节点则将当前节点设置为中间
-                System.out.println("Middle Point is : " + getJobList().size());
+                // System.out.println("Middle Point is : " + getJobList().size());
                 if (middlePoint < 0) {
                     setMiddlePoint(getJobList().size());
                 }
             }
-            System.out.println("---- Machine " + m.getMachineName() + " : start->" + timeEntry.getStartTime()
-                               + ", end-->" + timeEntry.getEndTime());
+            // System.out.println("---- Machine " + m.getMachineName() + " : start->" + timeEntry.getStartTime()
+            // + ", end-->" + timeEntry.getEndTime());
             job.getWorkDetails().put(m, timeEntry);
             profitAndLoss += job.getJobType().getRev();
             Integer jobCount = jobType$count.get(job.getJobType());
@@ -81,6 +82,14 @@ public class ExecuteResult {
             }
         }
         return true;
+    }
+
+    public String getResultName() {
+        return resultName;
+    }
+
+    public void setResultName(String resultName) {
+        this.resultName = resultName;
     }
 
     public void resetAllMachine() {
@@ -131,5 +140,9 @@ public class ExecuteResult {
             }
         }
         return avaliable;
+    }
+    
+    public String toString() {
+        return this.getResultName() + " : " + this.getProfitAndLoss();
     }
 }

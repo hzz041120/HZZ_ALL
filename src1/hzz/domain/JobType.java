@@ -84,7 +84,6 @@ public class JobType {
 
     public boolean equals(Object obj) {
         if (obj == null) return false;
-        System.out.println(jobName + "<===>" + ((JobType) obj).getJobName());
         return jobName.equals(((JobType) obj).getJobName());
     }
 

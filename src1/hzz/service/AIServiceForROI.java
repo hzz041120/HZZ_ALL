@@ -105,11 +105,14 @@ public class AIServiceForROI {
     private ExecuteResult findSelfJobList() {
         /** 初始化解集合 */
         List<ExecuteResult> resultList = initOriginalResult(initResSize);
+        System.out.println("ProfitAndLoss: " + getBestResult(resultList).getProfitAndLoss());
         for (int i = 0; i < generation; i++) {
             /** 交叉 */
             resultList = recombination(resultList);
+            System.out.println("ProfitAndLoss" + i + ": " + getBestResult(resultList).getProfitAndLoss());
             /** 变异 */
             mutation(resultList);
+            System.out.println("ProfitAndLoss" + i + ": " + getBestResult(resultList).getProfitAndLoss());
         }
         return getBestResult(resultList);
     }
@@ -167,9 +170,7 @@ public class AIServiceForROI {
                 if (!res.addJob(job)) {
                     break;
                 }
-                System.out.println("--- Add " + job.getJobType().getJobName());
             }
-            System.out.println("Execute " + i + "End init!");
             resList.add(res);
         }
         return resList;
@@ -178,7 +179,7 @@ public class AIServiceForROI {
     public static void main(String[] args) {
         AIServiceForROI service = new AIServiceForROI();
         service.init();
-        service.generation = 2;
+        service.generation = 1000;
         service.initResSize = 10;
         
         service.process();
