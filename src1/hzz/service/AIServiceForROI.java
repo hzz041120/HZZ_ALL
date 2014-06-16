@@ -23,16 +23,16 @@ import java.util.Map;
 public class AIServiceForROI {
 
     /** 初始条件 */
-    // 加工日期限制
+    /** 加工日期限制 */
     public static int                           worktime                = 0;
-    // 工件类型及生产数量
+    /** 工件类型及生产数量 */
     public static Map<JobType, Integer>         jobType$count           = new HashMap<JobType, Integer>();
-    // 工件类型及其外包商
+    /** 工件类型及其外包商 */
     public static Map<JobType, OutSourcingCorp> jobType$outSourcingCorp = new HashMap<JobType, OutSourcingCorp>();
     /** 算法精细化参数 */
-    // 初始化解集大小 必须是偶数个便于交叉 改进方案再说
+    /** 初始化解集大小 必须是偶数个便于交叉 改进方案再说 */
     private int                                 initResSize             = 5 * 2;
-    // 遗传代数
+    /** 遗传代数 */
     private int                                 generation              = 10000;
 
     /**
@@ -103,6 +103,7 @@ public class AIServiceForROI {
     }
 
     private ExecuteResult findSelfJobList() {
+        //FIXME 时间足够充裕需要按照纯粹的高ROI工件填充法处理
         /** 初始化解集合 */
         List<ExecuteResult> resultList = initOriginalResult(initResSize);
         System.out.println("ProfitAndLoss: " + getBestResult(resultList).getProfitAndLoss());
