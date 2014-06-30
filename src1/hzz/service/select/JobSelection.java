@@ -1,4 +1,4 @@
-package hzz.service;
+package hzz.service.select;
 
 import hzz.domain.JobType;
 
@@ -23,22 +23,21 @@ public class JobSelection {
     private Collection<JobType>   jobs;
 
     public JobSelection(Collection<JobType> jobs) {
+        if (jobs == null || jobs.isEmpty()) throw new IllegalArgumentException("jobs can't be null!");
+        this.jobs = new ArrayList<JobType>(jobs);
         for (JobType job : jobs) {
             randomArea += job.getRoi();
         }
-//        System.out.println(randomArea);
         /* 精度100% 可以适当调高 */
         int percent = 0;
         for (JobType job : jobs) {
-//            System.out.println("Start ! ===>" + job.getJobName());
             int newPercent = (int) (scale * (job.getRoi() / randomArea)) + percent;
-//            System.out.println("percent ===> " + newPercent);
             for (int i = percent; i < newPercent; i++) {
-//                System.out.println(i + " === " + job.getJobName());
                 randomJobMark.put(i, job);
             }
             percent = newPercent;
         }
+        // 由于不能很好的分配精度比例，会有小数所以微调随机精度范围至整数
         scale = percent;
     }
 
@@ -49,16 +48,12 @@ public class JobSelection {
      */
     public JobType getRandomJobByRoi() {
         int nextInt = random.nextInt(scale);
-//         System.out.println(nextInt);
+        // System.out.println(nextInt);
         return randomJobMark.get(nextInt);
     }
 
     public Collection<JobType> getJobs() {
         return jobs;
-    }
-
-    public void setJobs(Collection<JobType> jobs) {
-        this.jobs = jobs;
     }
 
     public static void main(String[] args) {
@@ -67,13 +62,14 @@ public class JobSelection {
         jobs.add(JobType.newJobType("J2", 100, -9, 50, null));
         jobs.add(JobType.newJobType("J2", 100, -9, 50, null));
         JobSelection js = new JobSelection(jobs);
-//        while (true) {
-//            JobType res = js.getRandomJobByRoi();
-//            if (res == null) {
-//                System.out.println("===================>");
-//                break;
-//            }
-//        }
+        System.out.println(js.randomJobMark);
+        // while (true) {
+        // JobType res = js.getRandomJobByRoi();
+        // if (res == null) {
+        // System.out.println("===================>");
+        // break;
+        // }
+        // }
     }
 
 }
