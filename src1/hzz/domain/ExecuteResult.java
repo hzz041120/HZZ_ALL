@@ -1,6 +1,9 @@
 package hzz.domain;
 
+import hzz.constants.WorkflowType;
 import hzz.service.AIServiceForROI;
+import hzz.service.select.JobSelection;
+import hzz.service.select.OutSourcingSelection;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,7 +22,6 @@ public class ExecuteResult {
     private Integer               profitAndLoss = 0;
     // 当前任务的类型和数量
     private Map<JobType, Integer> jobType$count = new HashMap<JobType, Integer>();
-
     public Integer getProfitAndLoss() {
         return profitAndLoss;
     }
@@ -29,15 +31,38 @@ public class ExecuteResult {
     }
 
     // 执行过行
-    private List<Job> jobList = new ArrayList<Job>();
+    private List<Job> jobList            = new ArrayList<Job>();
+    // 外包任务队列
+    private List<Job> outSourcingJobList = new ArrayList<Job>();
+    // 拒绝加工任务队列
+    private List<Job> rejectJobList      = new ArrayList<Job>();
     // 以时间为维度的任务中间节点的任务下标,用于交叉计算
     private int       middlePoint;
 
     public ExecuteResult(int worktime) {
-        this.worktime = worktime;
+        this(worktime, null);
     }
 
-    private boolean isAllowAddJob(Job job) {
+    public List<Job> getOutSourcingJobList() {
+        return outSourcingJobList;
+    }
+
+    public List<Job> getRejectJobList() {
+        return rejectJobList;
+    }
+
+    public ExecuteResult(int worktime, ExecuteResult selfRes) {
+        this.worktime = worktime;
+        this.jobType$count = new HashMap<JobType, Integer>(selfRes.getJobType$count());
+        this.jobList = new ArrayList<Job>(selfRes.getJobList());
+        this.outSourcingJobList = new ArrayList<Job>(selfRes.getOutSourcingJobList());
+        this.rejectJobList = new ArrayList<Job>(selfRes.getRejectJobList());
+        this.middlePoint = selfRes.getMiddlePoint();
+        this.profitAndLoss = selfRes.getProfitAndLoss();
+        this.resultName = selfRes.getResultName();
+    }
+
+    protected boolean preSelfDoAdd(Job job) {
         LinkedHashMap<Machine, Integer> machine$time = job.getJobType().getMachine$time();
         // 上一台机器的当前工作时间点
         int preMachineDelay = 0;
@@ -62,24 +87,12 @@ public class ExecuteResult {
             // 更新机器的工作计划
             m.setStartWorkDelay(endTime);
             if (startWorkDelay < middleTime && endTime >= middleTime) {
-                // System.out.println("startWorkDelay: " + startWorkDelay + ", middleTime:" + middleTime + ", endTime:"
-                // + endTime);
                 // 只要有一个机器触及中间时间节点则将当前节点设置为中间
-                // System.out.println("Middle Point is : " + getJobList().size());
                 if (middlePoint < 0) {
                     setMiddlePoint(getJobList().size());
                 }
             }
-            // System.out.println("---- Machine " + m.getMachineName() + " : start->" + timeEntry.getStartTime()
-            // + ", end-->" + timeEntry.getEndTime());
             job.getWorkDetails().put(m, timeEntry);
-            profitAndLoss += job.getJobType().getRev();
-            Integer jobCount = jobType$count.get(job.getJobType());
-            if (jobCount == null) {
-                jobCount = 1;
-            } else {
-                jobCount++;
-            }
         }
         return true;
     }
@@ -105,12 +118,49 @@ public class ExecuteResult {
      * @return true 表示添加成功，false表示无法添加了
      */
     public boolean addJob(Job job) {
-        if (isAllowAddJob(job)) {
-            getJobList().add(job);
-            return true;
+        JobType jobType = job.getJobType();
+        Integer jobCount = this.jobType$count.get(jobType);
+        if (jobCount == null) {
+            jobCount = 1;
         } else {
+            jobCount++;
+        }
+        if (jobCount > AIServiceForROI.jobType$count.get(jobType)) {
             return false;
         }
+        jobType$count.put(jobType, jobCount);
+        boolean allowAdd = true;
+        WorkflowType workflowType = job.getWorkflowType();
+        switch (workflowType) {
+            case selfDo:
+                allowAdd = preSelfDoAdd(job);
+                if (allowAdd) {
+                    getJobList().add(job);
+                    profitAndLoss += jobType.getRev();
+                } else return false;
+                break;
+            case outSourcing:
+                if (allowAdd = preOutSourcingAdd(job)) {
+                    outSourcingJobList.add(job);
+                    OutSourcingCorp outSourcingCorp = job.getOutSourcingCorp();
+                    profitAndLoss += outSourcingCorp.getOutSourcingMap().get(jobType).getRev();
+                } else return false;
+                break;
+            case reject:
+                rejectJobList.add(job);
+                profitAndLoss += jobType.getRejectRev();
+                break;
+            default:
+                throw new IllegalArgumentException("Unkown workflow type!" + job);
+        }
+        if (!allowAdd) return false;
+
+        return true;
+    }
+
+    private boolean preOutSourcingAdd(Job job) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
     public int getMiddlePoint() {
@@ -133,7 +183,7 @@ public class ExecuteResult {
         Collection<JobType> avaliable = new ArrayList<JobType>();
         for (Map.Entry<JobType, Integer> entry : AIServiceForROI.jobType$count.entrySet()) {
             JobType key = entry.getKey();
-            Integer currentCnt = jobType$count.get(key);
+            Integer currentCnt = this.jobType$count.get(key);
             currentCnt = currentCnt == null ? 0 : currentCnt;
             if (currentCnt <= entry.getValue()) {
                 avaliable.add(key);
@@ -141,7 +191,56 @@ public class ExecuteResult {
         }
         return avaliable;
     }
-    
+
+    public Collection<JobTypeOutSourcingEntry> getAvaliableOutSourcingJobTypeList() {
+        Collection<JobTypeOutSourcingEntry> avaliable = new ArrayList<JobTypeOutSourcingEntry>();
+        for (Map.Entry<JobType, Integer> entry : AIServiceForROI.jobType$count.entrySet()) {
+            JobType key = entry.getKey();
+            Integer currentCnt = this.jobType$count.get(key);
+            currentCnt = currentCnt == null ? 0 : currentCnt;
+            if (currentCnt <= entry.getValue()) {
+                List<OutSourcingCorp> corps = AIServiceForROI.jobType$outSourcingCorps.get(key);
+                for (OutSourcingCorp osc : corps) {
+                    avaliable.add(new JobTypeOutSourcingEntry(key, osc));
+                }
+            }
+        }
+        return avaliable;
+    }
+
+    public Job getJobByWorkflow(WorkflowType workflowType, Object excludeRandomItem) {
+        Job job = null;
+        switch (workflowType) {
+            case selfDo:
+                Collection<JobType> avaliableJobTypeList = getAvaliableJobTypeList();
+                if (excludeRandomItem != null) {
+                    avaliableJobTypeList.remove(excludeRandomItem);
+                }
+                if (avaliableJobTypeList == null || avaliableJobTypeList.isEmpty()) {
+                    return null;
+                }
+                JobSelection js = new JobSelection(avaliableJobTypeList);
+                job = js.getRandomJobByRoi().getInstance(workflowType);
+                break;
+            case outSourcing:
+                Collection<JobTypeOutSourcingEntry> avaliableOutSourcingJobTypeList = getAvaliableOutSourcingJobTypeList();
+                if (excludeRandomItem != null) {
+                    avaliableOutSourcingJobTypeList.remove(excludeRandomItem);
+                }
+                if (avaliableOutSourcingJobTypeList == null || avaliableOutSourcingJobTypeList.isEmpty()) {
+                    return null;
+                }
+                OutSourcingSelection outSourcingSelection = new OutSourcingSelection(avaliableOutSourcingJobTypeList);
+                JobTypeOutSourcingEntry jobTypeOutSourcingEntry = outSourcingSelection.getRandomJobByRoi();
+                job = jobTypeOutSourcingEntry.getJobType().getInstance(workflowType);
+                job.setOutSourcingCorp(jobTypeOutSourcingEntry.getOutSourcingCorp());
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupport workflowtype! workflowType:" + workflowType);
+        }
+        return job;
+    }
+
     public String toString() {
         return this.getResultName() + " : " + this.getProfitAndLoss();
     }

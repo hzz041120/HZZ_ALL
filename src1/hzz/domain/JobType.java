@@ -1,5 +1,7 @@
 package hzz.domain;
 
+import hzz.constants.WorkflowType;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -34,10 +36,6 @@ public class JobType {
     // 拒绝加工的利润
     private Integer                         rejectRev;
     private double                          roi;
-
-    // 外包加工的时间
-    // 外包加工的利润
-    // 拒绝的利润
 
     public double getRoi() {
         return roi;
@@ -75,10 +73,10 @@ public class JobType {
         return jobTypeMap.values();
     }
 
-    public Job getInstance() {
+    public Job getInstance(WorkflowType workflowType) {
         Job instance = new Job();
         instance.setJobType(this);
-        // instance.setRealWorkTime(timeCost);
+        instance.setWorkflowType(workflowType);
         return instance;
     }
 

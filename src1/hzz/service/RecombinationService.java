@@ -1,10 +1,16 @@
 package hzz.service;
 
+import hzz.constants.WorkflowType;
 import hzz.domain.ExecuteResult;
 import hzz.domain.Job;
+import hzz.domain.JobType;
+import hzz.domain.JobTypeOutSourcingEntry;
+import hzz.service.select.JobSelection;
+import hzz.service.select.OutSourcingSelection;
 import hzz.util.ExecuteResultComparator;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,20 +22,22 @@ import java.util.List;
 public class RecombinationService {
 
     // intermediate recombination
-    public static List<ExecuteResult> doIntermediateRecobination(List<ExecuteResult> resultList) {
+    public static List<ExecuteResult> doIntermediateRecobination(List<ExecuteResult> resultList,
+                                                                 WorkflowType workflowType) {
         // 进行相邻分组 可改进
         int i = 0;
         List<ExecuteResult> resList = new ArrayList<ExecuteResult>(resultList.size());
         while (i < resultList.size()) {
             ExecuteResult firstRes = resultList.get(i++);
             ExecuteResult secondRes = resultList.get(i++);
-            List<ExecuteResult> crossResList = doCross(firstRes, secondRes);
+            List<ExecuteResult> crossResList = doCross(firstRes, secondRes, workflowType);
             resList.addAll(crossResList);
         }
         return resList;
     }
 
-    private static List<ExecuteResult> doCross(ExecuteResult firstRes, ExecuteResult secondRes) {
+    private static List<ExecuteResult> doCross(ExecuteResult firstRes, ExecuteResult secondRes,
+                                               WorkflowType workflowType) {
         List<ExecuteResult> res = new ArrayList<ExecuteResult>();
         firstRes.setResultName("firstRes");
         res.add(firstRes);
@@ -45,22 +53,22 @@ public class RecombinationService {
         List<Job> f21 = sJobList.subList(0, smp);
         List<Job> f22 = sJobList.subList(smp, sJobList.size());
 
-        ExecuteResult child1 = getCrossResult(firstRes, f11, f21);
+        ExecuteResult child1 = getCrossResult(firstRes, f11, f21, workflowType);
         if (child1 != null) {
             child1.setResultName("child1");
             res.add(child1);
         }
-        ExecuteResult child2 = getCrossResult(firstRes, f11, f22);
+        ExecuteResult child2 = getCrossResult(firstRes, f11, f22, workflowType);
         if (child2 != null) {
             child2.setResultName("child2");
             res.add(child2);
         }
-        ExecuteResult child3 = getCrossResult(firstRes, f12, f21);
+        ExecuteResult child3 = getCrossResult(firstRes, f12, f21, workflowType);
         if (child3 != null) {
             child3.setResultName("child3");
             res.add(child3);
         }
-        ExecuteResult child4 = getCrossResult(firstRes, f12, f21);
+        ExecuteResult child4 = getCrossResult(firstRes, f12, f21, workflowType);
         if (child4 != null) {
             child4.setResultName("child4");
             res.add(child4);
@@ -74,7 +82,8 @@ public class RecombinationService {
         return res.subList(0, 2);
     }
 
-    private static ExecuteResult getCrossResult(ExecuteResult firstRes, List<Job> x, List<Job> y) {
+    private static ExecuteResult getCrossResult(ExecuteResult firstRes, List<Job> x, List<Job> y,
+                                                WorkflowType workflowType) {
         ExecuteResult child = new ExecuteResult(firstRes.getWorktime());
         for (Job j : x) {
             if (!child.addJob(j)) {
@@ -87,11 +96,14 @@ public class RecombinationService {
             }
         }
         while (true) {
-            JobSelection js = new JobSelection(child.getAvaliableJobTypeList());
-            if (!child.addJob(js.getRandomJobByRoi().getInstance())) {
+            Job job = child.getJobByWorkflow(workflowType, null);
+            if (job == null || !child.addJob(job)) {
                 break;
             }
         }
         return child;
     }
+
+   
+
 }

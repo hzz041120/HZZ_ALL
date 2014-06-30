@@ -1,5 +1,7 @@
 package hzz.domain;
 
+import hzz.constants.WorkflowType;
+
 import java.util.LinkedHashMap;
 
 /**
@@ -9,24 +11,34 @@ import java.util.LinkedHashMap;
  */
 public class Job {
 
-//    /* 单个需要的工作时间 */
-//    private int                               realWorkTime;
     /* 任务类型 */
     private JobType                           jobType;
-
+    /* 生产类型 */
+    private WorkflowType                      workflowType;
+    /* 外包商 */
+    private OutSourcingCorp                   outSourcingCorp;
+    /* 自产机器工作明细 */
     private LinkedHashMap<Machine, TimeEntry> workDetails = new LinkedHashMap<Machine, TimeEntry>();
 
-//    public int getRealWorkTime() {
-//        return realWorkTime;
-//    }
+    public WorkflowType getWorkflowType() {
+        return workflowType;
+    }
+
+    public OutSourcingCorp getOutSourcingCorp() {
+        return outSourcingCorp;
+    }
+
+    public void setOutSourcingCorp(OutSourcingCorp outSourcingCorp) {
+        this.outSourcingCorp = outSourcingCorp;
+    }
+
+    public void setWorkflowType(WorkflowType workflowType) {
+        this.workflowType = workflowType;
+    }
 
     public JobType getJobType() {
         return jobType;
     }
-
-//    public void setRealWorkTime(int realWorkTime) {
-//        this.realWorkTime = realWorkTime;
-//    }
 
     public void setJobType(JobType jobType) {
         this.jobType = jobType;
