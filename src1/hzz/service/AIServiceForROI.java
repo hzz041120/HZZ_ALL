@@ -90,7 +90,7 @@ public class AIServiceForROI {
             /** 获得拒绝加工的产品流水 */
             _jobType$count = new HashMap<JobType, Integer>();
             if (needTodo(afterOutSourcingRes, _jobType$count)) {
-                ExecuteResult rejectRes = findRejectJobList(_jobType$count);
+                ExecuteResult result = findRejectJobList(afterOutSourcingRes);
             }
             /** 打印生产计划表 */
             // FIXME
@@ -110,8 +110,11 @@ public class AIServiceForROI {
         return needTodo;
     }
 
-    private ExecuteResult findRejectJobList(Map<JobType, Integer> _jobType$count) {
-        // FIXME
+    private ExecuteResult findRejectJobList(ExecuteResult afterOutSourcingRes) {
+        Map<JobType, Integer> currentJobTypeCount = afterOutSourcingRes.getJobType$count();
+        for(Map.Entry<JobType, Integer> entry: jobType$count.entrySet()) {
+            //FIXME
+        }
         return null;
     }
 

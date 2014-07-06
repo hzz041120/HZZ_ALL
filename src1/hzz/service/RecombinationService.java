@@ -69,10 +69,35 @@ public class RecombinationService {
             }
             i++;
         }
+        boolean firstAllow = true;
         ExecuteResult firstCrossRes = new ExecuteResult(firstRes.getWorktime(), firstRes);
         firstCrossRes.setOutSourcingJobMap(new HashMap<OutSourcingCorp, List<Job>>());
-        
-        return null;
+        for (List<Job> jList : c1.values()) {
+            for (Job j : jList) {
+                if (!firstCrossRes.addJob(j)) {
+                    firstAllow = false;
+                }
+            }
+        }
+        if (firstAllow) {
+            res.add(firstCrossRes);
+        }
+
+        boolean secondAllow = true;
+        ExecuteResult secondCrossRes = new ExecuteResult(firstRes.getWorktime(), firstRes);
+        secondCrossRes.setOutSourcingJobMap(new HashMap<OutSourcingCorp, List<Job>>());
+        for (List<Job> jList : c2.values()) {
+            for (Job j : jList) {
+                if (!secondCrossRes.addJob(j)) {
+                    secondAllow = false;
+                }
+            }
+        }
+        if (secondAllow) {
+            res.add(secondCrossRes);
+        }
+        List<ExecuteResult> sortRes = sortByRevAndGetBest2(res);
+        return sortRes;
     }
 
     private static List<ExecuteResult> doCrossSelfDo(ExecuteResult firstRes, ExecuteResult secondRes,
