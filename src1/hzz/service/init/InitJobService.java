@@ -85,9 +85,14 @@ public class InitJobService {
                     continue;
                 }
                 Job job = jobType.getInstance(WorkflowType.outSourcing);
-                job.setOutSourcingCorp(jobTypeOutSourcingEntry.getOutSourcingCorp());
+                final OutSourcingCorp osc = jobTypeOutSourcingEntry.getOutSourcingCorp();
+                job.setOutSourcingCorp(osc);
                 if (!res.addJob(job)) {
-                    break;
+                    outSourcingSelection = outSourcingSelection.removeOutSourcingCorpAndReInit(osc);
+                    if (outSourcingSelection == null) {
+                        break;
+                    }
+                    continue;
                 }
             }
             System.out.println("Init " + i + " Rev:" + res.getProfitAndLoss());

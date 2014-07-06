@@ -92,6 +92,18 @@ public class OutSourcingSelection {
         return new OutSourcingSelection(JobTypeOutSourcingEntrys);
     }
 
+    public OutSourcingSelection removeOutSourcingCorpAndReInit(OutSourcingCorp osc) {
+        Iterator<JobTypeOutSourcingEntry> iter = JobTypeOutSourcingEntrys.iterator();
+        while (iter.hasNext()) {
+            JobTypeOutSourcingEntry jtose = iter.next();
+            if (jtose.getOutSourcingCorp().equals(osc)) {
+                iter.remove();
+            }
+        }
+        if (JobTypeOutSourcingEntrys.isEmpty()) return null;
+        return new OutSourcingSelection(JobTypeOutSourcingEntrys);
+    }
+
     public static void main(String[] args) {
         Collection<OutSourcingCorp> outSourcingCorps = new ArrayList<OutSourcingCorp>();
         Map<JobType, OutSourcingDetail> o1 = new HashMap<JobType, OutSourcingCorp.OutSourcingDetail>();

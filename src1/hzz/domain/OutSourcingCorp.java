@@ -1,8 +1,11 @@
 package hzz.domain;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * 外包商
@@ -11,9 +14,11 @@ import java.util.Map;
  */
 public class OutSourcingCorp {
 
-    private static Map<String, OutSourcingCorp> outSourcingCorpMap = new HashMap<String, OutSourcingCorp>();
+    private static final Random                 r                   = new Random();
+    private static Map<String, OutSourcingCorp> outSourcingCorpMap  = new HashMap<String, OutSourcingCorp>();
+    private static List<OutSourcingCorp>        outSourcingCorpList = new ArrayList<OutSourcingCorp>();
     // 可以接收新任务的开始时间
-    private int                                 startWorkDelay = 0;
+    private int                                 startWorkDelay      = 0;
 
     public static Map<String, OutSourcingCorp> getOutSourcingCorpMap() {
         return outSourcingCorpMap;
@@ -23,8 +28,9 @@ public class OutSourcingCorp {
         return startWorkDelay;
     }
 
-    public static void setOutSourcingCorpMap(Map<String, OutSourcingCorp> outSourcingCorpMap) {
-        OutSourcingCorp.outSourcingCorpMap = outSourcingCorpMap;
+    public static OutSourcingCorp getCorpByRandom() {
+        int randomSize = r.nextInt(outSourcingCorpList.size());
+        return outSourcingCorpList.get(randomSize);
     }
 
     public void setStartWorkDelay(int startWorkDelay) {
@@ -41,6 +47,8 @@ public class OutSourcingCorp {
         }
         this.outSourcingMap = outSourcingMap;
         this.outSourcingName = outSourcingName;
+        outSourcingCorpList.add(this);
+        outSourcingCorpMap.put(outSourcingName, this);
     }
 
     /** 外包商名称 */
@@ -83,6 +91,10 @@ public class OutSourcingCorp {
 
     public double getRoiByJobType(JobType jobType) {
         return outSourcingMap.get(jobType).getRoi();
+    }
+
+    public Integer gettIimeCostByJobType(JobType jobType) {
+        return outSourcingMap.get(jobType).getTimeCost();
     }
 
     public static class OutSourcingDetail {

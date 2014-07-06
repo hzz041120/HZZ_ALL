@@ -15,13 +15,16 @@ import java.util.Map.Entry;
 
 public class ExecuteResult {
 
-    private String                resultName;
+    private String                        resultName;
     // 预期的可执行时间
-    private Integer               worktime;
+    private Integer                       worktime;
+    // 记录每个外包公司的已消耗时间
+    private Map<OutSourcingCorp, Integer> outSourcingCorpTimeMap = new HashMap<OutSourcingCorp, Integer>();
     // 总损益
-    private Integer               profitAndLoss = 0;
+    private Integer                       profitAndLoss          = 0;
     // 当前任务的类型和数量
-    private Map<JobType, Integer> jobType$count = new HashMap<JobType, Integer>();
+    private Map<JobType, Integer>         jobType$count          = new HashMap<JobType, Integer>();
+
     public Integer getProfitAndLoss() {
         return profitAndLoss;
     }
@@ -31,13 +34,13 @@ public class ExecuteResult {
     }
 
     // 执行过行
-    private List<Job> jobList            = new ArrayList<Job>();
+    private List<Job>                       jobList           = new ArrayList<Job>();
     // 外包任务队列
     private Map<OutSourcingCorp, List<Job>> outSourcingJobMap = new HashMap<OutSourcingCorp, List<Job>>();
     // 拒绝加工任务队列
-    private List<Job> rejectJobList      = new ArrayList<Job>();
+    private List<Job>                       rejectJobList     = new ArrayList<Job>();
     // 以时间为维度的任务中间节点的任务下标,用于交叉计算
-    private int       middlePoint;
+    private int                             middlePoint;
 
     public ExecuteResult(int worktime) {
         this(worktime, null);
@@ -45,6 +48,10 @@ public class ExecuteResult {
 
     public Map<OutSourcingCorp, List<Job>> getOutSourcingJobMap() {
         return outSourcingJobMap;
+    }
+
+    public void setOutSourcingJobMap(Map<OutSourcingCorp, List<Job>> outSourcingJobMap) {
+        this.outSourcingJobMap = outSourcingJobMap;
     }
 
     public List<Job> getRejectJobList() {
@@ -112,7 +119,7 @@ public class ExecuteResult {
     }
 
     /**
-     * 添加一个任务进工作队列
+     * 添加一个任务进工作队列 FIXME 把外部的数量不允许的异常放入这里统一处理
      * 
      * @param job
      * @return true 表示添加成功，false表示无法添加了
@@ -143,7 +150,7 @@ public class ExecuteResult {
                 if (allowAdd = preOutSourcingAdd(job)) {
                     final OutSourcingCorp _outSourcingCorp = job.getOutSourcingCorp();
                     List<Job> jobs = outSourcingJobMap.get(_outSourcingCorp);
-                    if(jobs == null) {
+                    if (jobs == null) {
                         jobs = new ArrayList<Job>();
                         outSourcingJobMap.put(_outSourcingCorp, jobs);
                     }
@@ -163,8 +170,15 @@ public class ExecuteResult {
     }
 
     private boolean preOutSourcingAdd(Job job) {
-        // TODO Auto-generated method stub
-        return false;
+        OutSourcingCorp osc = job.getOutSourcingCorp();
+        JobType jobType = job.getJobType();
+        Integer startTime = outSourcingCorpTimeMap.get(osc);
+        startTime = startTime == null ? 0 : startTime;
+        Integer jobTimeCost = osc.gettIimeCostByJobType(jobType);
+        int endTime = startTime + jobTimeCost;
+        if (endTime > worktime) return false;
+        outSourcingCorpTimeMap.put(osc, endTime);
+        return true;
     }
 
     public int getMiddlePoint() {
@@ -217,6 +231,7 @@ public class ExecuteResult {
         switch (workflowType) {
             case selfDo:
                 Collection<JobType> avaliableJobTypeList = getAvaliableJobTypeList();
+                if (avaliableJobTypeList == null || avaliableJobTypeList.isEmpty()) return null;
                 if (excludeRandomItem != null) {
                     avaliableJobTypeList.remove(excludeRandomItem);
                 }
@@ -228,6 +243,9 @@ public class ExecuteResult {
                 break;
             case outSourcing:
                 Collection<JobTypeOutSourcingEntry> avaliableOutSourcingJobTypeList = getAvaliableOutSourcingJobTypeList();
+                if (avaliableOutSourcingJobTypeList == null || avaliableOutSourcingJobTypeList.isEmpty()) {
+                    return null;
+                }
                 if (excludeRandomItem != null) {
                     avaliableOutSourcingJobTypeList.remove(excludeRandomItem);
                 }

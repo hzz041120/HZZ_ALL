@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 机器
+ * 机器 FIXME 把可以接受新任务时间的属性挪进 ExecuteResult
  * 
  * @author hzz041120 2014年4月6日 下午8:12:38
  */
