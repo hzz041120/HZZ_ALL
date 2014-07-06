@@ -33,7 +33,7 @@ public class ExecuteResult {
     // 执行过行
     private List<Job> jobList            = new ArrayList<Job>();
     // 外包任务队列
-    private List<Job> outSourcingJobList = new ArrayList<Job>();
+    private Map<OutSourcingCorp, List<Job>> outSourcingJobMap = new HashMap<OutSourcingCorp, List<Job>>();
     // 拒绝加工任务队列
     private List<Job> rejectJobList      = new ArrayList<Job>();
     // 以时间为维度的任务中间节点的任务下标,用于交叉计算
@@ -43,8 +43,8 @@ public class ExecuteResult {
         this(worktime, null);
     }
 
-    public List<Job> getOutSourcingJobList() {
-        return outSourcingJobList;
+    public Map<OutSourcingCorp, List<Job>> getOutSourcingJobMap() {
+        return outSourcingJobMap;
     }
 
     public List<Job> getRejectJobList() {
@@ -55,7 +55,7 @@ public class ExecuteResult {
         this.worktime = worktime;
         this.jobType$count = new HashMap<JobType, Integer>(selfRes.getJobType$count());
         this.jobList = new ArrayList<Job>(selfRes.getJobList());
-        this.outSourcingJobList = new ArrayList<Job>(selfRes.getOutSourcingJobList());
+        this.outSourcingJobMap = new HashMap<OutSourcingCorp, List<Job>>(selfRes.getOutSourcingJobMap());
         this.rejectJobList = new ArrayList<Job>(selfRes.getRejectJobList());
         this.middlePoint = selfRes.getMiddlePoint();
         this.profitAndLoss = selfRes.getProfitAndLoss();
@@ -141,9 +141,13 @@ public class ExecuteResult {
                 break;
             case outSourcing:
                 if (allowAdd = preOutSourcingAdd(job)) {
-                    outSourcingJobList.add(job);
-                    OutSourcingCorp outSourcingCorp = job.getOutSourcingCorp();
-                    profitAndLoss += outSourcingCorp.getOutSourcingMap().get(jobType).getRev();
+                    final OutSourcingCorp _outSourcingCorp = job.getOutSourcingCorp();
+                    List<Job> jobs = outSourcingJobMap.get(_outSourcingCorp);
+                    if(jobs == null) {
+                        jobs = new ArrayList<Job>();
+                        outSourcingJobMap.put(_outSourcingCorp, jobs);
+                    }
+                    profitAndLoss += _outSourcingCorp.getOutSourcingMap().get(jobType).getRev();
                 } else return false;
                 break;
             case reject:

@@ -4,7 +4,6 @@ import hzz.constants.WorkflowType;
 import hzz.domain.ExecuteResult;
 import hzz.domain.Job;
 import hzz.domain.JobType;
-import hzz.service.select.JobSelection;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,8 +34,6 @@ public class MutationService {
         JobType jobType = job.getJobType();
         keySet.remove(jobType);
         if (keySet == null || keySet.isEmpty()) return execRes;
-        JobSelection jobSelection = new JobSelection(keySet);
-        JobType newJobType = jobSelection.getRandomJobByRoi();
         jobList.set(mutationIndex, mutationRes.getJobByWorkflow(workflowType, null));
         for (Job j : jobList) {
             if (!mutationRes.addJob(j)) {

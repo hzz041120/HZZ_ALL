@@ -3,14 +3,9 @@ package hzz.service;
 import hzz.constants.WorkflowType;
 import hzz.domain.ExecuteResult;
 import hzz.domain.Job;
-import hzz.domain.JobType;
-import hzz.domain.JobTypeOutSourcingEntry;
-import hzz.service.select.JobSelection;
-import hzz.service.select.OutSourcingSelection;
 import hzz.util.ExecuteResultComparator;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
