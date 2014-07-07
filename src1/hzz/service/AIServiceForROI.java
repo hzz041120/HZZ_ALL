@@ -2,6 +2,7 @@ package hzz.service;
 
 import hzz.constants.WorkflowType;
 import hzz.domain.ExecuteResult;
+import hzz.domain.Job;
 import hzz.domain.JobType;
 import hzz.domain.Machine;
 import hzz.domain.OutSourcingCorp;
@@ -112,10 +113,17 @@ public class AIServiceForROI {
 
     private ExecuteResult findRejectJobList(ExecuteResult afterOutSourcingRes) {
         Map<JobType, Integer> currentJobTypeCount = afterOutSourcingRes.getJobType$count();
-        for(Map.Entry<JobType, Integer> entry: jobType$count.entrySet()) {
-            //FIXME
+        for (Map.Entry<JobType, Integer> entry : jobType$count.entrySet()) {
+            JobType jobType = entry.getKey();
+            Integer currentjc = currentJobTypeCount.get(jobType);
+            Integer needCount = entry.getValue();
+            while (currentjc < needCount) {
+                Job job = jobType.getInstance(WorkflowType.reject);
+                afterOutSourcingRes.addJob(job);
+                currentjc++;
+            }
         }
-        return null;
+        return afterOutSourcingRes;
     }
 
     private ExecuteResult findOutSourcingJobList(ExecuteResult selfRes) {
