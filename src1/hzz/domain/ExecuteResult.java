@@ -60,13 +60,15 @@ public class ExecuteResult {
 
     public ExecuteResult(int worktime, ExecuteResult selfRes) {
         this.worktime = worktime;
-        this.jobType$count = new HashMap<JobType, Integer>(selfRes.getJobType$count());
-        this.jobList = new ArrayList<Job>(selfRes.getJobList());
-        this.outSourcingJobMap = new HashMap<OutSourcingCorp, List<Job>>(selfRes.getOutSourcingJobMap());
-        this.rejectJobList = new ArrayList<Job>(selfRes.getRejectJobList());
-        this.middlePoint = selfRes.getMiddlePoint();
-        this.profitAndLoss = selfRes.getProfitAndLoss();
-        this.resultName = selfRes.getResultName();
+        if (selfRes != null) {
+            this.jobType$count = new HashMap<JobType, Integer>(selfRes.getJobType$count());
+            this.jobList = new ArrayList<Job>(selfRes.getJobList());
+            this.outSourcingJobMap = new HashMap<OutSourcingCorp, List<Job>>(selfRes.getOutSourcingJobMap());
+            this.rejectJobList = new ArrayList<Job>(selfRes.getRejectJobList());
+            this.middlePoint = selfRes.getMiddlePoint();
+            this.profitAndLoss = selfRes.getProfitAndLoss();
+            this.resultName = selfRes.getResultName();
+        }
     }
 
     protected boolean preSelfDoAdd(Job job) {

@@ -41,38 +41,38 @@ public class AIServiceForROI {
      * 初始化生产环境
      */
     public void init() {
-        worktime = 400;
+        worktime = 50;
         // 初始化工件表
         jobType$count = new HashMap<JobType, Integer>();
         LinkedHashMap<Machine, Integer> j1Machine$time = new LinkedHashMap<Machine, Integer>();
         j1Machine$time.put(Machine.newMachine("m1"), 5);
         j1Machine$time.put(Machine.newMachine("m2"), 5);
         j1Machine$time.put(Machine.newMachine("m3"), 7);
-        jobType$count.put(JobType.newJobType("J1", 78, -9, 53, j1Machine$time), 1);
+        jobType$count.put(JobType.newJobType("J1", 78, -9, 53, j1Machine$time), 2);
 
         LinkedHashMap<Machine, Integer> j2Machine$time = new LinkedHashMap<Machine, Integer>();
         j2Machine$time.put(Machine.newMachine("m1"), 4);
         j2Machine$time.put(Machine.newMachine("m2"), 6);
         j2Machine$time.put(Machine.newMachine("m3"), 8);
-        jobType$count.put(JobType.newJobType("J2", 95, -10, 61, j2Machine$time), 1);
+        jobType$count.put(JobType.newJobType("J2", 95, -10, 61, j2Machine$time), 2);
 
         LinkedHashMap<Machine, Integer> j3Machine$time = new LinkedHashMap<Machine, Integer>();
         j3Machine$time.put(Machine.newMachine("m1"), 2);
         j3Machine$time.put(Machine.newMachine("m2"), 4);
         j3Machine$time.put(Machine.newMachine("m3"), 10);
-        jobType$count.put(JobType.newJobType("J3", 102, -7, 43, j3Machine$time), 1);
+        jobType$count.put(JobType.newJobType("J3", 102, -7, 43, j3Machine$time), 2);
 
         LinkedHashMap<Machine, Integer> j4Machine$time = new LinkedHashMap<Machine, Integer>();
         j4Machine$time.put(Machine.newMachine("m1"), 7);
         j4Machine$time.put(Machine.newMachine("m2"), 9);
         j4Machine$time.put(Machine.newMachine("m3"), 5);
-        jobType$count.put(JobType.newJobType("J4", 89, -13, 67, j4Machine$time), 1);
+        jobType$count.put(JobType.newJobType("J4", 89, -13, 67, j4Machine$time), 2);
 
         LinkedHashMap<Machine, Integer> j5Machine$time = new LinkedHashMap<Machine, Integer>();
         j5Machine$time.put(Machine.newMachine("m1"), 9);
         j5Machine$time.put(Machine.newMachine("m2"), 3);
         j5Machine$time.put(Machine.newMachine("m3"), 5);
-        jobType$count.put(JobType.newJobType("J5", 93, -5, 55, j5Machine$time), 1);
+        jobType$count.put(JobType.newJobType("J5", 93, -5, 55, j5Machine$time), 2);
         // 初始化外包商表
 
     }
@@ -104,7 +104,9 @@ public class AIServiceForROI {
         boolean needTodo = false;
         for (Entry<JobType, Integer> selfDoTypeCount : selfDoCount) {
             JobType type = selfDoTypeCount.getKey();
-            int todoCount = _jobType$count.get(type) - selfDoTypeCount.getValue();
+            Integer needDo = _jobType$count.get(type) == null ? 0 : _jobType$count.get(type);
+//            System.out.println(type.getJobName() + " >>> "  + needDo  + " |||| " + selfDoTypeCount.getValue());
+            int todoCount = needDo - selfDoTypeCount.getValue();
             if (todoCount > 0) needTodo = true;
             _jobType$count.put(type, todoCount);
         }
