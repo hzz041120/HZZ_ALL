@@ -1,13 +1,9 @@
 package hzz2.service.select;
 
-import hzz2.domain.Job;
-import hzz2.domain.JobType;
-import hzz2.domain.OutSourcingCorp;
+import hzz2.domain.WorkType;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -18,31 +14,21 @@ import java.util.Random;
  */
 public class JobSelection {
 
-    private double                randomArea;
-    //FIXME 缓存它 
-    private Map<Integer, JobType> randomJobMark = new HashMap<Integer, JobType>();
-    private int                   scale         = 100;
-    private static final Random   random        = new Random();
-    private Collection<JobType>   jobs;
+    private double                 randomArea;
+    private Map<Integer, WorkType> randomJobMark = new HashMap<Integer, WorkType>();
+    private int                    scale         = 100;
+    private static final Random    random        = new Random();
 
-    public static Job getRandomJob(JobType jobType) {
-        double randomArea = jobType.getRoi();
-        for (OutSourcingCorp osc : OutSourcingCorp.getAllOutSourcingCrops()) {
-            randomArea += osc.getRoiByJobType(jobType);
+    public JobSelection(Collection<WorkType> workTypes) {
+        if (workTypes == null || workTypes.size() == 0) {
+            throw new IllegalArgumentException("jobs can't be null!");
         }
-        
-        return null;
-    }
-
-    public JobSelection(Collection<JobType> jobs) {
-        if (jobs == null || jobs.isEmpty()) throw new IllegalArgumentException("jobs can't be null!");
-        this.jobs = new ArrayList<JobType>(jobs);
-        for (JobType job : jobs) {
-            randomArea += job.getRoi();
+        for (WorkType work : workTypes) {
+            randomArea += work.getRoi();
         }
         /* 精度100% 可以适当调高 */
         int percent = 0;
-        for (JobType job : jobs) {
+        for (WorkType job : workTypes) {
             int newPercent = (int) (scale * (job.getRoi() / randomArea)) + percent;
             for (int i = percent; i < newPercent; i++) {
                 randomJobMark.put(i, job);
@@ -58,30 +44,10 @@ public class JobSelection {
      * 
      * @return
      */
-    public JobType getRandomJobByRoi() {
+    public WorkType getRandomJobByRoi() {
         int nextInt = random.nextInt(scale);
         // System.out.println(nextInt);
         return randomJobMark.get(nextInt);
-    }
-
-    public Collection<JobType> getJobs() {
-        return jobs;
-    }
-
-    public static void main(String[] args) {
-        List<JobType> jobs = new ArrayList<JobType>();
-        jobs.add(JobType.newJobType("J1", 100, -9, 100, null));
-        jobs.add(JobType.newJobType("J2", 100, -9, 50, null));
-        jobs.add(JobType.newJobType("J2", 100, -9, 50, null));
-        JobSelection js = new JobSelection(jobs);
-        System.out.println(js.randomJobMark);
-        // while (true) {
-        // JobType res = js.getRandomJobByRoi();
-        // if (res == null) {
-        // System.out.println("===================>");
-        // break;
-        // }
-        // }
     }
 
 }

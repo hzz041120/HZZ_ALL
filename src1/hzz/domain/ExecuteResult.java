@@ -111,6 +111,8 @@ public class ExecuteResult {
     public void setResultName(String resultName) {
         this.resultName = resultName;
     }
+    
+    
 
     public void resetAllMachine() {
         for (Machine m : Machine.machineMap.values()) {

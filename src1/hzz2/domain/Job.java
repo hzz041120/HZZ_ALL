@@ -13,34 +13,60 @@ import java.util.Map;
 public class Job {
 
     /* 生产模式 */
-    private WorkType                          workType;
-    /* 自产机器工作明细 */
-    private LinkedHashMap<Machine, TimeEntry> workDetails = new LinkedHashMap<Machine, TimeEntry>();
+    private WorkType                         workType;
+    private boolean                          reject      = false;
+    /* 实际生产的开始时间 */
+    private Integer                          realStart;
+    /* 实际生产的结束时间 */
+    private Integer                          realEnd;
+    /* 自产机器工作明细 machine$timeEntry */
+    private LinkedHashMap<String, TimeEntry> workDetails = new LinkedHashMap<String, TimeEntry>();
 
-    public double getRoi() {
-        return workType.getRoi();
-    }
-
-    public LinkedHashMap<Machine, TimeEntry> getWorkDetails() {
+    public LinkedHashMap<String, TimeEntry> getWorkDetails() {
         return workDetails;
     }
 
-    public void setWorkDetails(LinkedHashMap<Machine, TimeEntry> workDetails) {
+    public void setWorkDetails(LinkedHashMap<String, TimeEntry> workDetails) {
         this.workDetails = workDetails;
     }
 
-    public void addWorkItem(Machine m, TimeEntry timeEntry) {
-        workDetails.put(m, timeEntry);
+    public void addWorkItem(String machine, TimeEntry timeEntry) {
+        if (workDetails.isEmpty()) {
+            realStart = timeEntry.getStartTime();
+        }
+        workDetails.put(machine, timeEntry);
+        realEnd = timeEntry.getEndTime();
+    }
+
+    public Integer getRealTimeCost() {
+        if (!reject && workType.getOurSourcingName() == null) {
+            return realEnd - realStart;
+        } else return 0;
+    }
+
+    public WorkType getWorkType() {
+        return workType;
+    }
+
+    public void setWorkType(WorkType workType) {
+        this.workType = workType;
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder("\n" + workType.getJobTypeName()).append("{\n");
-        WorkTypeEnum workTypeEnum = workType.getWorkType();
+        WorkTypeEnum workTypeEnum = null;
+        if(reject) {
+            workTypeEnum = WorkTypeEnum.reject;
+        } else if (workType.getOurSourcingName() == null) {
+            workTypeEnum = WorkTypeEnum.selfDo;
+        } else {
+            workTypeEnum = WorkTypeEnum.outSourcing;
+        }
         sb.append("\tworkType:").append(workTypeEnum.name());
         if (workTypeEnum == WorkTypeEnum.selfDo) {
             sb.append(",\n\tmachineDetail:").append("{\n");
-            for (Map.Entry<Machine, TimeEntry> entry : workDetails.entrySet()) {
-                sb.append("\t\t").append(entry.getKey().getMachineName()).append(":").append(entry.getValue().getStartTime()).append("--->").append(entry.getValue().getEndTime()).append(",\n");
+            for (Map.Entry<String, TimeEntry> entry : workDetails.entrySet()) {
+                sb.append("\t\t").append(entry.getKey()).append(":").append(entry.getValue().getStartTime()).append("--->").append(entry.getValue().getEndTime()).append(",\n");
             }
             sb.deleteCharAt(sb.length() - 1);
             sb.append("\t}\n");
@@ -49,6 +75,14 @@ public class Job {
         }
         sb.append("}\n");
         return sb.toString();
+    }
+
+    public boolean isReject() {
+        return reject;
+    }
+
+    public void setReject(boolean reject) {
+        this.reject = reject;
     }
 
 }
