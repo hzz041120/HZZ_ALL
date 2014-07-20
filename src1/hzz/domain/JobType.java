@@ -27,9 +27,9 @@ public class JobType {
     }
 
     private String                          jobName;
-    // 自主加工需要的时间
+    // 自主加工所允许的最大时间
     private Integer                         timeCost;
-    // 每个机器加工需要的时间
+    // 每个机器加工需要的时间及顺序
     private LinkedHashMap<Machine, Integer> machine$time;
     // 自主加工的利润
     private Integer                         rev;
@@ -72,6 +72,7 @@ public class JobType {
     public static Collection<JobType> getAllJobType() {
         return jobTypeMap.values();
     }
+    
 
     public Job getInstance(WorkflowType workflowType) {
         Job instance = new Job();

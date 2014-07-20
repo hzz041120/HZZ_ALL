@@ -35,46 +35,47 @@ public class AIServiceForROI {
     /** 初始化解集大小 必须是偶数个便于交叉 改进方案再说 */
     public static final int                           initResSize              = 5 * 2;
     /** 遗传代数 */
-    public static final int                           generation               = 10000;
+    public static final int                           generation               = 100;
 
     /**
      * 初始化生产环境
      */
     public void init() {
-        worktime = 50;
+        worktime = 43;
         // 初始化工件表
         jobType$count = new HashMap<JobType, Integer>();
         LinkedHashMap<Machine, Integer> j1Machine$time = new LinkedHashMap<Machine, Integer>();
         j1Machine$time.put(Machine.newMachine("m1"), 5);
         j1Machine$time.put(Machine.newMachine("m2"), 5);
         j1Machine$time.put(Machine.newMachine("m3"), 7);
-        jobType$count.put(JobType.newJobType("J1", 78, -9, 53, j1Machine$time), 2);
+        jobType$count.put(JobType.newJobType("J1", 78, -9, 53, j1Machine$time), 1);
 
         LinkedHashMap<Machine, Integer> j2Machine$time = new LinkedHashMap<Machine, Integer>();
         j2Machine$time.put(Machine.newMachine("m1"), 4);
         j2Machine$time.put(Machine.newMachine("m2"), 6);
         j2Machine$time.put(Machine.newMachine("m3"), 8);
-        jobType$count.put(JobType.newJobType("J2", 95, -10, 61, j2Machine$time), 2);
+        jobType$count.put(JobType.newJobType("J2", 95, -10, 61, j2Machine$time), 1);
 
         LinkedHashMap<Machine, Integer> j3Machine$time = new LinkedHashMap<Machine, Integer>();
         j3Machine$time.put(Machine.newMachine("m1"), 2);
         j3Machine$time.put(Machine.newMachine("m2"), 4);
         j3Machine$time.put(Machine.newMachine("m3"), 10);
-        jobType$count.put(JobType.newJobType("J3", 102, -7, 43, j3Machine$time), 2);
+        jobType$count.put(JobType.newJobType("J3", 102, -7, 43, j3Machine$time), 1);
 
         LinkedHashMap<Machine, Integer> j4Machine$time = new LinkedHashMap<Machine, Integer>();
         j4Machine$time.put(Machine.newMachine("m1"), 7);
         j4Machine$time.put(Machine.newMachine("m2"), 9);
         j4Machine$time.put(Machine.newMachine("m3"), 5);
-        jobType$count.put(JobType.newJobType("J4", 89, -13, 67, j4Machine$time), 2);
+        jobType$count.put(JobType.newJobType("J4", 89, -13, 67, j4Machine$time), 1);
 
         LinkedHashMap<Machine, Integer> j5Machine$time = new LinkedHashMap<Machine, Integer>();
         j5Machine$time.put(Machine.newMachine("m1"), 9);
         j5Machine$time.put(Machine.newMachine("m2"), 3);
         j5Machine$time.put(Machine.newMachine("m3"), 5);
-        jobType$count.put(JobType.newJobType("J5", 93, -5, 55, j5Machine$time), 2);
+        jobType$count.put(JobType.newJobType("J5", 93, -5, 55, j5Machine$time), 1);
         // 初始化外包商表
-
+        
+//        jobType$outSourcingCorps.putAll(JobType.);
     }
 
     /**
@@ -87,10 +88,12 @@ public class AIServiceForROI {
         /** 获得外包加工的产品流水 */
         Map<JobType, Integer> _jobType$count = new HashMap<JobType, Integer>();
         if (needTodo(selfRes, _jobType$count)) {
+            System.out.println(">>>>>Can OutSourcing result:" + _jobType$count);
             ExecuteResult afterOutSourcingRes = findOutSourcingJobList(selfRes);
             /** 获得拒绝加工的产品流水 */
             _jobType$count = new HashMap<JobType, Integer>();
             if (needTodo(afterOutSourcingRes, _jobType$count)) {
+                System.out.println("reject count:" + _jobType$count);
                 ExecuteResult result = findRejectJobList(afterOutSourcingRes);
             }
             /** 打印生产计划表 */
@@ -104,11 +107,11 @@ public class AIServiceForROI {
         boolean needTodo = false;
         for (Entry<JobType, Integer> selfDoTypeCount : selfDoCount) {
             JobType type = selfDoTypeCount.getKey();
-            Integer needDo = _jobType$count.get(type) == null ? 0 : _jobType$count.get(type);
+            Integer totalCount = jobType$count.get(type);
 //            System.out.println(type.getJobName() + " >>> "  + needDo  + " |||| " + selfDoTypeCount.getValue());
-            int todoCount = needDo - selfDoTypeCount.getValue();
-            if (todoCount > 0) needTodo = true;
-            _jobType$count.put(type, todoCount);
+            int needDo = totalCount - selfDoTypeCount.getValue();
+            if (needDo > 0) needTodo = true;
+            _jobType$count.put(type, needDo);
         }
         return needTodo;
     }
@@ -142,6 +145,7 @@ public class AIServiceForROI {
             mutation(resultList, WorkflowType.outSourcing);
             bestResult = getBestResult(resultList);
             System.out.println("A2 ProfitAndLoss" + i + ": " + bestResult.getProfitAndLoss());
+            System.out.println("A2 ProfitAndLoss" + i + ": " + bestResult.getJobList());
         }
         return bestResult;
     }
@@ -151,16 +155,17 @@ public class AIServiceForROI {
         /** 初始化解集合 */
         List<ExecuteResult> resultList = InitJobService.initOriginalResult();
         ExecuteResult bestResult = getBestResult(resultList);
-        System.out.println("ProfitAndLoss: " + bestResult.getProfitAndLoss());
+        System.out.println("SelfDo ProfitAndLoss: " + bestResult.getProfitAndLoss());
         for (int i = 0; i < generation; i++) {
             /** 交叉 */
             resultList = recombination(resultList, WorkflowType.selfDo);
             bestResult = getBestResult(resultList);
-            System.out.println("A1 ProfitAndLoss" + i + ": " + bestResult.getProfitAndLoss());
+            System.out.println("SelfDo recombination ProfitAndLoss" + i + ": " + bestResult.getProfitAndLoss());
             /** 变异 */
             mutation(resultList, WorkflowType.selfDo);
             bestResult = getBestResult(resultList);
-            System.out.println("A2 ProfitAndLoss" + i + ": " + bestResult.getProfitAndLoss());
+            System.out.println("SelfDo mutation ProfitAndLoss" + i + ": " + bestResult.getProfitAndLoss());
+            System.out.println("SelfDo jobDetail " + i + ": " + bestResult.getJobList());
         }
         return bestResult;
     }

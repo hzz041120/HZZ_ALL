@@ -66,6 +66,7 @@ public class MutationService {
     private static ExecuteResult selfDoMutation(ExecuteResult execRes) {
         ExecuteResult mutationRes = new ExecuteResult(execRes.getWorktime(), execRes);
         List<Job> jobList = execRes.getJobList();
+        if(jobList.size() == 0) return execRes;
         int mutationIndex = random.nextInt(jobList.size());
         Job job = jobList.get(mutationIndex);
         // 获取除当前任务外的其他任务，做轮盘随机

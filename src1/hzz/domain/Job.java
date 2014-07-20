@@ -3,6 +3,7 @@ package hzz.domain;
 import hzz.constants.WorkflowType;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 编码后产生的任务实例
@@ -54,6 +55,16 @@ public class Job {
 
     public void addWorkItem(Machine m, TimeEntry timeEntry) {
         workDetails.put(m, timeEntry);
+    }
+    
+    public String toString() {
+        StringBuilder sb = new StringBuilder("\n" + getJobType().getJobName()).append("{\n");
+        for(Map.Entry<Machine, TimeEntry> entry : workDetails.entrySet()) {
+            sb.append("\t").append(entry.getKey().getMachineName()).append(":").append(entry.getValue().getStartTime()).append("--->").append(entry.getValue().getEndTime()).append(",\n");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("}\n");
+        return sb.toString();
     }
 
 }
